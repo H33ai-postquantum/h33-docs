@@ -22,7 +22,6 @@ curl -X POST https://api.h33.ai/api/v2/biometric/enroll \
 | H33-128 | BFV FHE biometric auth (NIST L1) | [h33.ai/h33-128](https://h33.ai/h33-128/) |
 | H33-256 | BFV FHE biometric auth (NIST L5) | [h33.ai/h33-256](https://h33.ai/h33-256/) |
 | H33-CKKS | Approximate FHE for ML inference | [h33.ai/h33-ckks](https://h33.ai/h33-ckks/) |
-| H33-FHE-IQ | Auto-routing FHE engine | [h33.ai/fhe-iq](https://h33.ai/fhe-iq/) |
 | ZK-STARK | Zero-knowledge proof verification | [h33.ai/zk](https://h33.ai/zk/) |
 | BotShield | Proof-of-work bot prevention | [h33.ai/botshield](https://h33.ai/botshield/) |
 | HICS | Code security scoring (open source) | [h33.ai/hics](https://h33.ai/hics/) |
