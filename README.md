@@ -35,7 +35,7 @@ Every API call executes the full post-quantum pipeline:
 3. **Dilithium** — ML-DSA-65 post-quantum attestation signature
 4. **3-Key** — Nested Dilithium + Falcon + SPHINCS+ (three mathematical families)
 
-**2,209,429 auth/sec sustained. 35.25µs per auth. Single ARM CPU.**
+**1,667,875 auth/sec sustained. 42µs per auth. Single ARM CPU.**
 
 ## SDKs
 

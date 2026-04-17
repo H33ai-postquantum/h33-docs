@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>H33-74: A Post-Quantum Primitive for Computation-Result Attestation &mdash; H33.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=2"><link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=2">
+
+
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1a1a1a;
+    --gold: #8a6940;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --gray: #666;
+    --dim: #444;
+    --card-bg: #f8f8f8;
+    --border: #ddd;
+    --code-bg: #f4f4f4;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #fff;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.72;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 820px; margin: 0 auto; padding: 5rem 1.5rem 4rem; }
+
+  
+
+  /* Title page */
+  .title-page { text-align: center; padding: 4rem 0 3rem; border-bottom: 1px solid var(--border); margin-bottom: 3rem; }
+  .title-page img { height: 56px; margin-bottom: 1.5rem; }
+  .title-page h1 { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.3rem; color: #111; }
+  .title-page .subtitle { font-size: 1.15rem; color: var(--gold); font-weight: 500; margin-bottom: 1.2rem; }
+  .title-page .author { font-size: 1rem; color: var(--dim); }
+  .title-page .date { font-size: 0.92rem; color: var(--gray); margin-top: 0.25rem; }
+
+  /* Abstract */
+  .abstract {
+    border-left: 4px solid var(--gold);
+    padding: 1.5rem 1.5rem;
+    margin-bottom: 2.5rem;
+    background: rgba(201,149,108,0.04);
+    border-radius: 0 6px 6px 0;
+  }
+  .abstract h2 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); margin-bottom: 0.75rem; }
+  .abstract p { font-size: 0.94rem; line-height: 1.78; color: var(--dim); }
+
+  /* Disclaimer */
+  .disclaimer {
+    background: #151515;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 3rem;
+  }
+  .disclaimer p { font-size: 0.82rem; color: var(--gray); line-height: 1.7; }
+  .disclaimer strong { color: var(--dim); }
+
+  /* TOC */
+  .toc { margin-bottom: 3rem; }
+  .toc h2 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; color: #111; }
+  .toc ul { list-style: none; }
+  .toc > ul > li { margin-bottom: 0.35rem; }
+  .toc > ul > li > ul { margin-left: 1.5rem; }
+  .toc > ul > li > ul > li { margin-bottom: 0.2rem; }
+  .toc a { color: var(--gold); text-decoration: none; font-size: 0.94rem; transition: color 0.15s; }
+  .toc a:hover { color: #e0b892; text-decoration: underline; }
+
+  /* Sections */
+  h2.section-title { font-size: 1.55rem; font-weight: 700; margin-top: 3.5rem; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); color: #111; }
+  h3.subsection-title { font-size: 1.2rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.5rem; color: var(--text); }
+  p { margin-bottom: 1rem; }
+  p + p { margin-top: 0; }
+
+  /* Definition boxes */
+  .definition-box {
+    border-left: 4px solid var(--gold);
+    background: rgba(201,149,108,0.04);
+    padding: 1rem 1.25rem;
+    margin: 1.25rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .definition-box .def-label { font-weight: 600; color: var(--gold); }
+
+  /* Theorem / Corollary boxes */
+  .theorem-box {
+    border-left: 4px solid var(--green);
+    background: rgba(74,222,128,0.04);
+    padding: 1rem 1.25rem;
+    margin: 1.25rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .theorem-box .thm-label { font-weight: 600; color: var(--green); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+  thead th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gold);
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 2px solid var(--border);
+  }
+  tbody td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--dim);
+    vertical-align: top;
+  }
+  tbody tr:hover { background: rgba(0,0,0,0.02); }
+
+  /* Pipeline bars */
+  .pipeline-bar {
+    display: inline-block;
+    height: 10px;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  .bar-gold { background: var(--gold); }
+  .bar-green { background: var(--green); }
+  .bar-blue { background: var(--blue); }
+
+  /* Card grid */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.25rem;
+  }
+  .card h4 { font-size: 0.95rem; font-weight: 600; color: #8a6940; margin-bottom: 0.4rem; }
+  .card p { font-size: 0.85rem; color: var(--dim); margin-bottom: 0; line-height: 1.6; }
+
+  /* Test cards */
+  .test-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+  }
+  .test-card h4 { font-size: 0.95rem; font-weight: 600; color: var(--green); margin-bottom: 0.4rem; }
+  .test-card p { font-size: 0.88rem; color: var(--dim); margin-bottom: 0; line-height: 1.65; }
+
+  /* Bug callout boxes */
+  .bug-callout {
+    background: #1a1010;
+    border: 1px solid #3a2020;
+    border-left: 4px solid #e05050;
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+  }
+  .bug-callout h4 { font-size: 0.95rem; font-weight: 600; color: #e05050; margin-bottom: 0.4rem; }
+  .bug-callout p { font-size: 0.88rem; color: var(--dim); margin-bottom: 0; line-height: 1.65; }
+
+  /* Ordered / unordered list styling */
+  ol, ul { margin: 0.75rem 0 1rem 1.5rem; }
+  li { margin-bottom: 0.35rem; }
+  li::marker { color: var(--gold); }
+
+  /* Inline code */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88em;
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    color: var(--gold);
+  }
+
+  /* Launch badge */
+  .badge-launch {
+    display: inline-block;
+    background: var(--gold);
+    color: #050505;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.15em 0.55em;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    vertical-align: middle;
+    margin-left: 0.4em;
+  }
+
+  /* Contribution list */
+  .contributions { margin: 1.25rem 0; }
+  .contributions li { margin-bottom: 0.75rem; }
+  .contributions li strong { color: var(--gold); }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 2.5rem 0 1rem;
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+    font-size: 0.85rem;
+    color: var(--gray);
+  }
+
+  /* Sup / Sub */
+  sup, sub { font-size: 0.75em; }
+
+  
+    .container { max-width: 100%; padding: 0; }
+    .title-page { border-bottom-color: #ccc; }
+    .title-page h1 { color: #111; }
+    .title-page .subtitle { color: #8a6940; }
+    .abstract { border-left-color: #8a6940; background: #faf5ef; }
+    .disclaimer { background: #f5f5f5; border-color: #ccc; }
+    .definition-box { background: #faf5ef; border-left-color: #8a6940; }
+    .theorem-box { background: #eefbe8; border-left-color: #22a050; }
+    .card, .test-card { background: #f9f9f9; border-color: #ccc; }
+    .bug-callout { background: #fff0f0; border-color: #c00; border-left-color: #c00; }
+    thead th { color: #8a6940; border-bottom-color: #ccc; }
+    tbody td { border-bottom-color: #eee; color: #333; }
+    a { color: #8a6940; }
+    h2.section-title { border-bottom-color: #ccc; color: #111; }
+    footer { border-top-color: #ccc; color: #666; }
+    code { background: #f0f0f0; color: #8a6940; }
+    .toc a { color: #8a6940; }
+  }
+
+  @media (max-width: 640px) {
+    .card-grid { grid-template-columns: 1fr; }
+    .title-page h1 { font-size: 1.6rem; }
+  }
+
+   }
+</style>
+</head>
+<body>
+
+
+
+<div class="container">
+
+<!-- TITLE PAGE -->
+<div class="title-page">
+  <img src="https://h33.ai/assets/images/h33-logo-400w.png" alt="H33.ai" style="height:56px;width:auto">
+  <h1>H33-74</h1>
+  <div class="subtitle">A Post-Quantum Primitive for Computation-Result Attestation</div>
+  <div class="author">Eric Beans &mdash; H33.ai, Inc.</div>
+  <div class="date">April 14, 2026</div>
+</div>
+
+
+<!-- ABSTRACT -->
+<div class="abstract">
+  <h2>Abstract</h2>
+  <p>We introduce H33-74, a cryptographic primitive that binds an arbitrary computation result to a three-family post-quantum signature bundle through a fixed-width 58-byte commitment and a 42-byte compact receipt. Forgery requires simultaneously producing a valid signature under three schemes whose security rests on three mutually disjoint hardness assumptions: Module Learning With Errors (ML-DSA, FIPS 204), Short Integer Solution over NTRU lattices (FALCON), and pre-image resistance of SHA2-256 (SLH-DSA, FIPS 205).</p>
+  <p>H33-74 is chain-agnostic and transport-agnostic. It supports unbounded Merkle aggregation under a fixed 74-byte persistent footprint, with per-result signing cost that decays as O(1/N). The reference deployment uses a NIST Level 1 family composition; an optional NIST Level 5 composition (ML-DSA-87, FALCON-1024, SLH-DSA-SHA2-256f) is available for deployments that require uniform Level 5 security at the cost of higher signing latency.</p>
+  <p>We present the construction, a security argument, measured performance from a production deployment on AWS Graviton4 &mdash; including a candid account of a 12&times; throughput regression we discovered and resolved in the cache layer's instrumentation code &mdash; a customer-hosted deployment model with Bitcoin-chain metering, a $0.025 per-mint launch rate, and nine implemented applications including post-quantum Bitcoin UTXO attestation and a proof-of-life construction that composes a ZK-STARK proof of secp256k1 discrete logarithm knowledge with the primitive's three-family attestation.</p>
+  <p>The bundle's formal NIST security level is bounded by its weakest family at Level 1; however, forgery requires simultaneously breaking all three families, not merely the weakest &mdash; the security design relies on assumption diversity rather than NIST-level parity (&sect;6.3). We intend this paper as an introduction to the Bitcoin developer community and to the wider post-quantum cryptography community, and we welcome review, criticism, and suggestions for improvement.</p>
+</div>
+
+<!-- DISCLAIMER -->
+<div class="disclaimer">
+  <p><strong>DISCLAIMER:</strong> This paper is provided for informational and technical-review purposes only. It is not an offer to sell, a solicitation of an offer to buy, a warranty, or a contractual commitment. Pricing, deployment terms, benchmark results, and feature availability described herein are illustrative of the reference commercial implementation as of the publication date and are subject to change. All commercial rights and obligations are governed solely by executed commercial license agreements between H33.ai, Inc. and the customer. Benchmark figures reflect specific test conditions described in Section 7 and are not guarantees of performance in customer deployments.</p>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<nav class="toc">
+  <h2>Contents</h2>
+  <ul>
+    <li><a href="#s1">1. Introduction</a>
+      <ul>
+        <li><a href="#s1-1">1.1. Scope of This Paper</a></li>
+        <li><a href="#s1-2">1.2. What H33-74 Proves and Does Not Prove</a></li>
+        <li><a href="#s1-3">1.3. The Structural Anchoring Property</a></li>
+      </ul>
+    </li>
+    <li><a href="#s2">2. Preliminaries</a>
+      <ul>
+        <li><a href="#s2-1">2.1. Notation</a></li>
+        <li><a href="#s2-2">2.2. Post-Quantum Signature Schemes</a></li>
+        <li><a href="#s2-3">2.3. Hash Functions</a></li>
+      </ul>
+    </li>
+    <li><a href="#s3">3. Definitions</a>
+      <ul>
+        <li><a href="#s3-1">3.1. Attestation Lifecycle</a></li>
+        <li><a href="#s3-2">3.2. Live Construction Proof &mdash; Bitcoin Mainnet, April 14, 2026</a></li>
+      </ul>
+    </li>
+    <li><a href="#s4">4. Construction</a>
+      <ul>
+        <li><a href="#s4-1">4.1. Mint</a></li>
+        <li><a href="#s4-2">4.2. Sign</a></li>
+        <li><a href="#s4-3">4.3. Verify</a></li>
+      </ul>
+    </li>
+    <li><a href="#s5">5. Batched Merkle Aggregation</a>
+      <ul>
+        <li><a href="#s5-1">5.1. Construction</a></li>
+        <li><a href="#s5-2">5.2. Amortized Cost</a></li>
+        <li><a href="#s5-3">5.3. Unbounded Aggregation</a></li>
+      </ul>
+    </li>
+    <li><a href="#s6">6. Security</a>
+      <ul>
+        <li><a href="#s6-1">6.1. Informal Statement</a></li>
+        <li><a href="#s6-2">6.2. Discussion</a></li>
+        <li><a href="#s6-3">6.3. Honest Security-Level Disclosure</a></li>
+        <li><a href="#s6-4">6.4. Why This Construction</a></li>
+      </ul>
+    </li>
+    <li><a href="#s7">7. Efficiency</a>
+      <ul>
+        <li><a href="#s7-1">7.1. Signing Cost</a></li>
+        <li><a href="#s7-2">7.2. Batched Throughput</a></li>
+        <li><a href="#s7-3">7.3. Pipeline Component Breakdown</a></li>
+        <li><a href="#s7-4">7.4. Optimizations Discovered During Load Testing</a></li>
+        <li><a href="#s7-5">7.5. Verification Cost</a></li>
+        <li><a href="#s7-6">7.6. Cache Memory Footprint</a></li>
+        <li><a href="#s7-7">7.7. Persistent Footprint</a></li>
+        <li><a href="#s7-8">7.8. Functional Verification</a></li>
+        <li><a href="#s7-9">7.9. Stress Tests and Limits</a></li>
+        <li><a href="#s7-10">7.10. Live Bitcoin Anchor Test (see &sect;3.2)</a></li>
+        <li><a href="#s7-11">7.11. NIST KAT Validation</a></li>
+      </ul>
+    </li>
+    <li><a href="#s8">8. Commercial Deployment and Licensing Model</a>
+      <ul>
+        <li><a href="#s8-1">8.1. Customer-Hosted Execution</a></li>
+        <li><a href="#s8-2">8.2. Trusted Execution Environment Protection</a></li>
+        <li><a href="#s8-3">8.3. License Fingerprint Embedding</a></li>
+        <li><a href="#s8-4">8.4. Bitcoin Chain Metering</a></li>
+        <li><a href="#s8-5">8.5. Module Breakout</a></li>
+      </ul>
+    </li>
+    <li><a href="#s9">9. Applications</a>
+      <ul>
+        <li><a href="#s9-1">9.1. Bitcoin UTXO Attestation (t = 0x06)</a></li>
+        <li><a href="#s9-2">9.2. HTTP API Response Attestation (t = 0x0C)</a></li>
+        <li><a href="#s9-3">9.3. AI Inference Provenance (t = 0x0D)</a></li>
+        <li><a href="#s9-4">9.4. Capture-Time Media Authenticity (t = 0x0E)</a></li>
+        <li><a href="#s9-5">9.5. Legal Evidence Chain of Custody (t = 0x0F)</a></li>
+        <li><a href="#s9-6">9.6. Federated Machine-Learning Mesh</a></li>
+        <li><a href="#s9-7">9.7. Authenticated Relay Messaging (t = 0x10)</a></li>
+        <li><a href="#s9-8">9.8. Identity Credential Attestation (t = 0x11)</a></li>
+        <li><a href="#s9-9">9.9. Post-Quantum Proof of Life (t = 0x12)</a></li>
+        <li><a href="#s9-10">9.10. What These Applications Have In Common</a></li>
+      </ul>
+    </li>
+    <li><a href="#s10">10. Related Work</a>
+      <ul>
+        <li><a href="#s10-1">10.1. Script-Layer Post-Quantum Bitcoin</a></li>
+        <li><a href="#s10-2">10.2. Single-Family Attestation Schemes</a></li>
+        <li><a href="#s10-3">10.3. Content Addressing</a></li>
+      </ul>
+    </li>
+    <li><a href="#s11">11. Open Problems</a>
+      <ul>
+        <li><a href="#s11-1">11.1. Independence of the Three Hardness Assumptions</a></li>
+        <li><a href="#s11-2">11.2. Post-Quantum Hash Function Choice</a></li>
+        <li><a href="#s11-3">11.3. Formal Verification of Batched Aggregation</a></li>
+        <li><a href="#s11-4">11.4. Standardization</a></li>
+        <li><a href="#s11-5">11.5. Integration with BitVM</a></li>
+        <li><a href="#s11-6">11.6. Threshold-of-Two Verification During Family Rotation</a></li>
+        <li><a href="#s11-7">11.7. Identity-Bound Document Attestation</a></li>
+        <li><a href="#s11-8">11.8. Crypto-Agile Algorithm Slot Architecture</a></li>
+        <li><a href="#s11-9">11.9. Zero-Knowledge Proof of Computation Integrity</a></li>
+      </ul>
+    </li>
+    <li><a href="#s12">12. Conclusion</a></li>
+    <li><a href="#s13">13. Acknowledgements</a></li>
+    <li><a href="#appendix-a">Appendix A. Benchmark Methodology</a></li>
+    <li><a href="#appendix-b">Appendix B. Pricing and Licensing</a></li>
+    <li><a href="#s14">14. References</a></li>
+    <li><a href="#s15">15. Contact</a></li>
+  </ul>
+</nav>
+
+<!-- ============================== -->
+<!-- SECTION 1: Introduction        -->
+<!-- ============================== -->
+<h2 class="section-title" id="s1">1. Introduction</h2>
+
+<p>The question of how to protect Bitcoin against a fault-tolerant quantum computer running Shor's algorithm [@shor1994] has received careful attention in the recent literature. Heilman [@heilman2024] demonstrated that Lamport signatures can be verified inside a Bitcoin script without OP_CAT, establishing a concrete path to quantum-safe spending under existing consensus rules. Linus's BINOHASH [@binohash2026] tightened this by providing a binomial-structured digest over which a HORS-compressed Lamport signature can be verified within the 201-opcode script budget. Most recently, Levy's QSB [@qsb2026] identified and patched a latent quantum vulnerability in BINOHASH's proof-of-work puzzle, replacing a signature-size puzzle whose security rests on ECDLP with a hash-to-sig puzzle whose security rests on RIPEMD-160 pre-image resistance. These are careful, technically rigorous papers, and we read them as genuine advances in the state of the art of in-script post-quantum Bitcoin.</p>
+
+<p>This paper is different in character. We are not proposing another script-layer construction. We are introducing a primitive.</p>
+
+<p>The distinction matters. QSB and BINOHASH are protocol constructions: they take a specific threat &mdash; signature forgery on a specific Bitcoin UTXO &mdash; and engineer a specific Bitcoin script that resists that threat under a specific quantum adversary model. They are works of cryptographic engineering in the tradition of Merkle [@merkle1979] and Lamport [@lamport1979], and they are valuable precisely because they are specific.</p>
+
+<p>H33-74, which we describe here, is a general-purpose primitive, in the tradition that we associate with the short-signature primitive of Boneh, Lynn and Shacham [@bls2001] or the constant-size polynomial commitment primitive of Kate, Zaverucha and Goldberg [@kzg2010]. A primitive, in our usage, is a small, well-typed cryptographic object with a fixed interface that exposes a few verifiable properties and admits many applications. The applications are not the primitive; the primitive is not any one of the applications. What we offer is an object &mdash; a 58-byte primitive commitment whose 32-byte hash anchors on-chain and whose 42-byte compact receipt lives off-chain, for an anchored footprint of 74 bytes &mdash; together with an interface and a security argument, and we enumerate a short list of applications that we ourselves have built on top of it. H33-74 does not depend on Bitcoin in any essential way. Bitcoin is simply one of its applications, and we spend a section of this paper describing it.</p>
+
+<p>The specific contributions of this paper are as follows.</p>
+
+<ol class="contributions">
+  <li><strong>Definition.</strong> We define H33-74 as a 58-byte commitment with an append-only domain-separator byte, and we define the compact receipt as a 42-byte committing digest of a three-family post-quantum signature bundle. The combined persistent footprint is 74 bytes.</li>
+  <li><strong>Construction.</strong> We give a concrete construction using SHA3-256 as the collision-resistant hash function, ML-DSA-65, FALCON-512, and SLH-DSA-SHA2-128f as the three signature families, and a binary Merkle tree for unbounded aggregation.</li>
+  <li><strong>Security.</strong> We argue that primitive forgery is infeasible for any adversary &mdash; classical or quantum &mdash; who cannot simultaneously break MLWE, SIS over NTRU lattices, and the pre-image resistance of SHA2-256 (the hash function underlying SLH-DSA). We state this as an informal theorem and sketch the reduction; a full proof is deferred to a long version.</li>
+  <li><strong>Efficiency.</strong> We report measured signing and verification costs from a production deployment of H33-74. The per-result signing cost is O(1/N) in a Merkle-aggregated batch of N results. We do not claim these numbers are optimal.</li>
+  <li><strong>Commercial Deployment Model.</strong> We describe a deployment in which the licensed signing binary runs entirely on customer-owned infrastructure, inside a Trusted Execution Environment, with no runtime dependency on centralized service infrastructure, and with licensing enforced by a self-metering mechanism whose billing ledger is the Bitcoin blockchain itself.</li>
+  <li><strong>Pricing.</strong> Flat $0.025 per-mint launch rate, all computation types. Global aggregate volume pricing. Current rates at <a href="https://h33.ai/pricing/" style="color:var(--gold)">h33.ai/pricing</a>.</li>
+  <li><strong>Applications.</strong> We enumerate nine applications of H33-74 that we have implemented: post-quantum Bitcoin UTXO attestation, HTTP API response attestation, AI inference provenance, capture-time media authenticity, legal evidence chain-of-custody, federated machine-learning mesh, authenticated relay messaging, identity credential attestation, and post-quantum proof of life &mdash; the last composing a ZK-STARK proof of secp256k1 discrete logarithm knowledge with the primitive's three-family attestation. We do not claim these are the only applications; we claim only that we have built them and that they all use the same 74-byte primitive.</li>
+</ol>
+
+<p>We do not claim novelty for any individual building block. SHA3 is not novel. Three-family signing bundles are not novel. Merkle aggregation of signed digests is not novel. The combination of these building blocks into a fixed-width primitive with an append-only computation-type registry and a batched amortization model is, to our knowledge, not prior art. We are prepared to be corrected on this point and we welcome citations that predate our work.</p>
+
+<h3 class="subsection-title" id="s1-1">1.1. Scope of This Paper</h3>
+
+<p>This paper is intended for two audiences with partial overlap: the Bitcoin developer community, which is actively working on post-quantum script-layer constructions and may find a complementary application-layer primitive useful; and the post-quantum cryptography community, which may find H33-74's fixed-width structure and three-hardness-assumption bundle of independent interest.</p>
+
+<p>We do not argue that H33-74 replaces QSB or BINOHASH. We argue the opposite: they solve a problem we do not attempt to solve, and we solve a problem they do not attempt to solve. Section 10 discusses the relationship in more detail.</p>
+
+<p>This paper introduces H33-74; Sections 8 and 9 describe the current reference commercial implementation. The reference implementation is a Rust crate whose source is publishable on request; the wire format is deliberately simple and re-implementable by any careful engineer in any memory-safe language in a weekend.</p>
+
+<h3 class="subsection-title" id="s1-2">1.2. What H33-74 Proves and Does Not Prove</h3>
+
+<p>A clear threat model requires stating what H33-74's attestation establishes, what it does not establish, and what must be supplied by the application layer.</p>
+
+<p>H33-74 proves: (1) that a computation result r with canonical hash H(r) was attested at time &tau; by the holder of a specific three-family key set; (2) that the attestation was signed under three independent post-quantum signature families whose forgery requires breaking three mutually disjoint hardness assumptions; and (3) that the attestation was anchored to the Bitcoin chain at a specific block height (when Bitcoin anchoring is used). If the Merkle aggregation construction of Section 5 is used, the primitive additionally proves inclusion of a specific leaf in a batch whose root was signed.</p>
+
+<p>H33-74 does not prove: (1) that the computation was performed correctly &mdash; it attests the result, not the computation that produced it; (2) that the input to the computation was authentic &mdash; a forged input produces a valid primitive over forged data; (3) that the signer's identity corresponds to any real-world entity &mdash; the primitive binds to a key set, not to an identity; or (4) that the content referenced by the hash H(r) is available &mdash; the primitive commits to a digest, not to storage.</p>
+
+<p>Application-specific metadata &mdash; such as model identifiers, device attestations, identity credentials, or provenance chains linking one primitive to another &mdash; must be encoded into the computation result r by the application layer. H33-74 provides the cryptographic envelope; the application defines what goes inside it.</p>
+
+<h3 class="subsection-title" id="s1-3">1.3. The Structural Anchoring Property</h3>
+
+<p>We draw attention to an architectural consequence of the construction that is implicit in the definitions above but that we believe merits explicit statement.</p>
+
+<p>H33-74 accepts an arbitrary computation type t &isin; T and an arbitrary computation result r. The signing message m(S) = SHA3-256(S) is a 32-byte value that anchors to the Bitcoin blockchain through existing transaction mechanisms &mdash; either as a Taproot key-path tweak on a transaction output, which adds zero marginal transaction weight and is indistinguishable from any other Taproot spend, or as a standard OP_RETURN payload that fits within the existing 80-byte data capacity with 6 bytes of margin. Neither anchoring method requires modification to Bitcoin's consensus rules, validator software, mempool relay policy, or transaction format. No soft fork is needed. No new opcode is introduced. No change to any full node's verification logic is required. H33-74 adds zero consensus burden to the Bitcoin network; it is fully standard and deployable today on any Taproot-enabled node.</p>
+
+<p>One consequence is that Bitcoin's existing transaction infrastructure &mdash; designed for value transfer and not for general-purpose computation attestation &mdash; appears to be sufficient, without modification, to serve as a global, immutable, post-quantum-secured timestamping layer for the attestation of arbitrary computation. H33-74 does not extend Bitcoin's protocol. It composes with Bitcoin's existing data-embedding capacity to surface a capability that the protocol has possessed since the activation of Taproot (block 709,632, November 2021) but that, to our knowledge, has not previously been exercised at the primitive level: the capacity to anchor post-quantum attestation of unbounded computation classes under a fixed-width commitment that imposes no additional protocol burden on the network.</p>
+
+<p>This is not a claim about Bitcoin's design intent. Bitcoin was not designed to attest computation. It is an observation about architectural sufficiency: a fixed-width, computation-agnostic commitment primitive, combined with a ledger that provides immutable, globally-replicated, permissionless data embedding, appears to produce &mdash; as a structural consequence &mdash; a cryptographic attestation anchor whose trust properties are inherited from the ledger's own consensus security. H33-74 supplies what Bitcoin lacks: post-quantum signature security under three independent hardness assumptions, computation-type domain separation through a protocol-level registry, and batched Merkle amortization that decays the per-result cost as O(1/N). Bitcoin supplies what the primitive lacks: global immutability, permissionless timestamping, and a fifteen-year track record of adversarial resilience under continuous public attack. We believe neither object alone provides both sets of properties; the composition does.</p>
+
+<p>We note that this emergent property is not specific to Bitcoin. Any ledger providing immutable, permissionless data embedding of at least 74 bytes per transaction output &mdash; including Ethereum, Solana, and others &mdash; inherits the same architectural role when composed with H33-74. We focus on Bitcoin because it is the oldest, most adversarially tested, and most widely trusted such ledger, and because the Bitcoin developer community is the primary audience for this paper.</p>
+
+<!-- ============================== -->
+<!-- SECTION 2: Preliminaries       -->
+<!-- ============================== -->
+<h2 class="section-title" id="s2">2. Preliminaries</h2>
+
+<p>We fix notation and recall the cryptographic primitives we build on.</p>
+
+<h3 class="subsection-title" id="s2-1">2.1. Notation</h3>
+
+<p>We write {0,1}<sup>n</sup> for the set of bit strings of length exactly n. We write || for concatenation. We write |x| for the byte length of a bit string x. We write SHA3-256(x) for the SHA3-256 hash of x (NIST FIPS 202, Keccak sponge construction), producing an element of {0,1}<sup>256</sup>. SHA3-256 is structurally distinct from SHA2-256 (Merkle-Damg&aring;rd construction) used natively by Bitcoin; the choice of SHA3-256 for H33-74 is discussed in &sect;11.2. SLH-DSA's security assumption rests on SHA2-256, not SHA3-256 &mdash; these are different hash functions with different constructions and different security arguments. Unless otherwise noted all multi-byte integers are big-endian.</p>
+
+<p>We write &#x1D49C; for an adversary and assume &#x1D49C; has access to both classical and quantum computation without explicit parameterization. When a specific computational model is needed, we present it to the reader explicitly.</p>
+
+<h3 class="subsection-title" id="s2-2">2.2. Post-Quantum Signature Schemes</h3>
+
+<p>We use three post-quantum digital signature schemes, each of which exposes a standard interface (KeyGen, Sign, Verify) and is existentially unforgeable under chosen-message attack under a specified hardness assumption.</p>
+
+<p><strong>ML-DSA-65.</strong> The NIST FIPS 204 [@fips204] standardized module-lattice signature scheme (formerly Dilithium) at parameter set 3. Security rests on the Module Learning With Errors (MLWE) assumption over module lattices, with a claimed NIST security category of Level 3. Signature length is 3,309 bytes.</p>
+
+<p><strong>FALCON-512.</strong> The NIST PQC Round 3 alternate signature [@falcon2022] (Draft FIPS 206 / FN-DSA, not yet finalized) at parameter set 512. Security rests on the Short Integer Solution (SIS) assumption over NTRU lattices, with a claimed NIST security category of Level 1. Signature length is bounded by 666 bytes.</p>
+
+<p><strong>SLH-DSA-SHA2-128f.</strong> The NIST FIPS 205 [@fips205] standardized stateless hash-based signature scheme (formerly SPHINCS+) in the SHA2-128f-simple parameter set. Security rests entirely on the pre-image resistance of SHA2-256 as a cryptographic hash function, with a claimed NIST security category of Level 1. Signature length is 17,088 bytes.</p>
+
+<p>We emphasize that the three schemes' underlying hardness assumptions are mutually disjoint. ML-DSA's security does not imply FALCON's, FALCON's does not imply SLH-DSA's, and SLH-DSA's does not imply either of the first two. A cryptanalytic advance against one family is not presumed to affect the others. We return to this point in Section 6.</p>
+
+<h3 class="subsection-title" id="s2-3">2.3. Hash Functions</h3>
+
+<p>We use SHA3-256 for all collision-resistant hashing in the construction. We require that SHA3-256 behave as a random oracle in the security argument of Section 6. We note that under Grover's algorithm [@grover1996] the effective pre-image resistance of a 256-bit hash falls from 2<sup>256</sup> to 2<sup>128</sup>, and the effective collision resistance falls from 2<sup>128</sup> to 2<sup>85.3</sup>. Both figures remain well above any currently considered practical threshold.</p>
+
+<!-- ============================== -->
+<!-- SECTION 3: Definitions         -->
+<!-- ============================== -->
+<h2 class="section-title" id="s3">3. Definitions</h2>
+
+<p>We now define the objects of the construction.</p>
+
+<div class="definition-box">
+  <p><span class="def-label">Definition 1 (Computation Type).</span> A computation type is an element of a globally registered append-only set T &sube; {0,1}<sup>8</sup>. Each element of T is assigned a mnemonic label and a semantic description. Elements are assigned in chronological order and are never retired, reassigned, or reinterpreted. The set T is part of H33-74's specification and is extended by specification revision, not by any cryptographic mechanism.</p>
+</div>
+
+<div class="definition-box">
+  <p><span class="def-label">Definition 2 (Computation Result).</span> A computation result is a bit string r together with a canonical byte encoding and a type t &isin; T. We write H(r) for the SHA3-256 hash of the canonical encoding of r.</p>
+</div>
+
+<div class="definition-box">
+  <p><span class="def-label">Definition 3 (Primitive).</span> A primitive is a 58-byte tuple S = (v, t, h, &tau;, &eta;) where v &isin; {0,1}<sup>8</sup> is a version byte (currently fixed at v = 1), t &isin; T is a computation type, h &isin; {0,1}<sup>256</sup> is a 32-byte content digest satisfying h = H(r) for some computation result r, &tau; &isin; {0,1}<sup>64</sup> is a 64-bit millisecond-precision Unix timestamp (Y2038-safe; overflows in year 292,278,994 CE), and &eta; &isin; {0,1}<sup>128</sup> is a 16-byte nonce drawn from a cryptographically secure random source. In commercial deployments, the nonce field may also carry a per-customer license fingerprint alongside fresh random bytes, as described in Section 8.3; to an external observer examining a single primitive, a fingerprinted nonce is indistinguishable from a uniformly random nonce of the same length; correlation across multiple primitives from the same deployment may reveal a constant prefix, as discussed in Section 8.3. The canonical byte encoding of S is the concatenation of these fields in the stated order, exactly 58 bytes.</p>
+</div>
+
+
+<div class="definition-box">
+  <p><span class="def-label">Definition 4 (Signing Message).</span> The signing message of a primitive S is m(S) = SHA3-256(canonical encoding of S), which is a 32-byte string.</p>
+</div>
+
+<div class="definition-box">
+  <p><span class="def-label">Definition 5 (Three-Family Signature Bundle).</span> A three-family signature bundle for a signing message m under a three-family key set (pk<sub>1</sub>, pk<sub>2</sub>, pk<sub>3</sub>) is a triple &sigma; = (&sigma;<sub>1</sub>, &sigma;<sub>2</sub>, &sigma;<sub>3</sub>) where &sigma;<sub>1</sub> is a valid ML-DSA-65 signature on m under pk<sub>1</sub>, &sigma;<sub>2</sub> is a valid FALCON-512 signature on m under pk<sub>2</sub>, and &sigma;<sub>3</sub> is a valid SLH-DSA-SHA2-128f signature on m under pk<sub>3</sub>.</p>
+</div>
+
+<div class="definition-box">
+  <p><span class="def-label">Definition 6 (Compact Receipt).</span> A compact receipt is a 42-byte tuple R = (v, f, c, &tau;) where v &isin; {0,1}<sup>8</sup> is a version byte, f &isin; {0,1}<sup>8</sup> is a bitfield identifying which signature families are present, c is a 32-byte verification digest computed as SHA3-256("h33:pq3:v1:full:" || m(S) || len(pk<sub>1</sub>) || pk<sub>1</sub> || len(pk<sub>2</sub>) || pk<sub>2</sub> || len(pk<sub>3</sub>) || pk<sub>3</sub> || len(&sigma;<sub>1</sub>) || &sigma;<sub>1</sub> || len(&sigma;<sub>2</sub>) || &sigma;<sub>2</sub> || len(&sigma;<sub>3</sub>) || &sigma;<sub>3</sub>), and &tau; &isin; {0,1}<sup>64</sup> is the signing-event timestamp echoed from the primitive. The digest c commits to the signing message, all three public keys, and all three signatures under a domain-separated, length-prefixed construction that prevents concatenation ambiguity. The canonical byte encoding of R is 42 bytes.</p>
+</div>
+
+<div class="definition-box">
+  <p><span class="def-label">Definition 7 (Attestation).</span> An attestation is a triple (S, R, &sigma;) where S is a primitive, R is a compact receipt, and &sigma; is a three-family signature bundle such that the c field of R is the verification digest defined in Definition 6, computed over the signing message m(S), the three public keys, and the three signatures. An attestation involves three distinct objects with different storage profiles:</p>
+
+  <p>(a) The 58-byte primitive S is the canonical commitment object. It is the input to Verify and must be retained or reconstructible by the application for any future verification. The application that produced the computation result r typically retains S alongside r in its own record store.</p>
+
+  <p>(b) The 32-byte signing message m(S) = SHA3-256(S) is the on-chain anchor. It can be committed to the Bitcoin chain via a Taproot key-path tweak (Q = P + H(P || m(S)) &middot; G, adding zero marginal weight to the transaction) or via a standard OP_RETURN output. The anchor is sufficient to detect tampering (any modification to S changes m(S)), but it is not sufficient to reconstruct S.</p>
+
+  <p>(c) The 42-byte compact receipt R is the off-chain verification summary. Its 32-byte verification digest c commits to the signing message, all three public keys, and all three signatures under the domain-separated construction defined in Definition 6. R also echoes the signing-event timestamp.</p>
+
+  <p>The anchored footprint is |m(S)| + |R| = 32 + 42 = 74 bytes: 32 bytes on-chain, 42 bytes in the receipt store. This is the storage cost borne by chain-expensive environments. The full verification record &mdash; needed to rerun Verify &mdash; is (S, R, &sigma;), which additionally requires the 58-byte primitive (retained by the application) and the ~21 KB ephemeral signature bundle (retained in the signer's off-chain signature store, indexed by R.c). The ephemeral bundle may be destroyed after verification at the signer's discretion; the primitive S must be retained by whoever wishes to re-verify in the future.</p>
+</div>
+
+<h3 class="subsection-title" id="s3-1">3.1. Attestation Lifecycle</h3>
+
+<p>The lifecycle of a single attestation proceeds through five stages:</p>
+
+<ol>
+  <li>A computation produces a result r. The application encodes r in a canonical byte format and selects a computation type t &isin; T.</li>
+  <li>The signer runs Mint(t, r) &rarr; S, producing a 58-byte primitive whose content digest field h = H(r) binds the primitive to the specific computation result.</li>
+  <li>The signer runs Sign(S, sk<sub>1</sub>, sk<sub>2</sub>, sk<sub>3</sub>) &rarr; (R, &sigma;), producing a 42-byte compact receipt R and a ~21 KB three-family signature bundle &sigma;. The receipt's verification digest c (defined in Definition 6) binds R to the signing message, public keys, and signatures without carrying &sigma;'s full weight.</li>
+  <li>The signer anchors m(S) = SHA3-256(S) to the Bitcoin chain &mdash; typically via a Taproot key-path tweak on the transaction output, or alternatively via OP_RETURN &mdash; stores R in the receipt store (42 bytes off-chain), and stores &sigma; in the ephemeral signature store (indexed by R.c).</li>
+  <li>A verifier retrieves (S, R, &sigma;), runs Verify, and optionally fetches the Bitcoin transaction to confirm the on-chain anchor. The verification is a pure function of public data.</li>
+</ol>
+
+<p>After verification, the ephemeral signature bundle &sigma; may be retained or destroyed at the signer's discretion. The 74-byte anchored footprint (32 bytes on-chain + 42 bytes off-chain) is the chain-visible cost of the attestation. Re-verification requires access to the full primitive S (58 bytes, retained by the application alongside its computation record) plus the signature bundle &sigma; (retrievable from the signer's store by R.c). The primitive S is not reconstructible from the 32-byte on-chain anchor alone.</p>
+
+<h3 class="subsection-title" id="s3-2">3.2. Live Construction Proof &mdash; Bitcoin Mainnet, April 14, 2026 &nbsp;<a href="/blog/first-primitive-on-bitcoin/" style="font-size:0.8rem;font-weight:500;color:var(--gold)">[full writeup]</a></h3>
+
+<p>To demonstrate that the attestation lifecycle described in &sect;3.1 executes end-to-end on production infrastructure, we present the first H33-74 anchored to the Bitcoin mainnet.</p>
+
+<p><strong>What was signed, where it went, and what it means.</strong> The payload signed was the ASCII string <em>"First H33-74 anchored to Bitcoin mainnet. April 14, 2026. Eric Beans, CEO, H33.ai, Inc. Patent pending #19/645,499."</em> This string was hashed via SHA3-256 to produce the 32-byte content digest h, assembled into a 58-byte primitive with computation type BitcoinUtxo (0x06) and a millisecond timestamp, and signed under all three families (ML-DSA-65: 760 &micro;s, FALCON-512: 183 &micro;s, SPHINCS+-SHA2-128f: 24,083 &micro;s &mdash; single-shot signing on a development workstation; production Graviton4 numbers are reported in &sect;7.1). The resulting 32-byte signing message m(S) = SHA3-256(S) was embedded in a standard Bitcoin transaction. The signature means: this exact string was attested at this exact millisecond under three independent post-quantum hardness assumptions, and that attestation is now permanently recorded on the Bitcoin blockchain.</p>
+
+<p><strong>Transaction.</strong> A standard Bitcoin transaction was constructed with three outputs: a Taproot P2TR output carrying H33-74's commitment via key-path tweak, an OP_RETURN output containing the 32-byte signing message, and a change output. The transaction was signed with Bitcoin Core 28.0, broadcast to the Bitcoin mainnet mempool via mempool.space, and is independently verifiable by any Bitcoin full node worldwide.</p>
+
+<div style="background:rgba(0,0,0,0.4);border:1px solid rgba(74,222,128,0.3);border-left:3px solid #4ade80;padding:16px 20px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8;">
+  <span style="color:#4ade80;font-weight:700;">Output 0: TAPROOT P2TR</span> &mdash; <span style="color:#E8B687;">bc1ph4s0l2d6jhjt6ntuemuvz5amar7t9h6dl2j73x898shyyyu80edqr4v5u9</span><br>
+  <span style="color:#4ade80;font-weight:700;">Output 1: OP_RETURN</span> &mdash; <span style="color:#E8B687;">1624756140f31ecd61c19d5c1427f221809a11893257b39bf601684e629d7af3</span>
+</div>
+
+<table>
+<thead><tr><th>Field</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Transaction ID</td><td><code>7f8d9ef2d5625d7e3acbc269daac21087ce6b7d77f8e4ec369aabdcdb028b4a7</code></td></tr>
+<tr><td>Network</td><td>Bitcoin mainnet</td></tr>
+<tr><td>Output 0 (Taproot)</td><td><code>bc1ph4s0l2d6jhjt6ntuemuvz5amar7t9h6dl2j73x898shyyyu80edqr4v5u9</code> (546 sats)</td></tr>
+<tr><td>Output 1 (OP_RETURN)</td><td><code>1624756140f31ecd61c19d5c1427f221809a11893257b39bf601684e629d7af3</code></td></tr>
+<tr><td>Signing message</td><td><code>1624756140f31ecd61c19d5c1427f221809a11893257b39bf601684e629d7af3</code></td></tr>
+<tr><td>Transaction size</td><td>280 bytes</td></tr>
+<tr><td>Fee</td><td>500 sats</td></tr>
+<tr><td>Block explorer</td><td><a href="https://mempool.space/tx/7f8d9ef2d5625d7e3acbc269daac21087ce6b7d77f8e4ec369aabdcdb028b4a7">mempool.space/tx/7f8d9ef2...b028b4a7</a></td></tr>
+</tbody>
+</table>
+
+<p>The complete verification chain is: plaintext payload &rarr; SHA3-256 &rarr; content hash &rarr; 58-byte primitive &rarr; SHA3-256 &rarr; 32-byte signing message &rarr; Bitcoin mainnet transaction &rarr; independently verifiable worldwide. No soft fork. No new opcodes. No consensus changes. Both anchoring methods (Taproot key-path tweak and OP_RETURN) verified in a single standard transaction. Performance benchmarks and additional verification details are presented in &sect;7.</p>
+
+<!-- ============================== -->
+<!-- SECTION 4: Construction        -->
+<!-- ============================== -->
+<h2 class="section-title" id="s4">4. Construction</h2>
+
+<p>H33-74 exposes three algorithms. The following diagram illustrates the end-to-end flow from computation result to Bitcoin anchor:</p>
+
+<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin:1.5rem 0;font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:2;color:var(--dim);overflow-x:auto;">
+<pre style="margin:0;">
+Computation result r
+        &darr;
+   SHA3-256(r) &rarr; h (32 bytes)
+        &darr;
+   Mint(t, r)  &rarr; S = (v, t, h, &tau;, &eta;)     &larr; 58-byte primitive
+        &darr;
+   SHA3-256(S) &rarr; m(S)                      &larr; 32-byte signing message
+        &darr;
+   Sign(S, sk&#x2081;, sk&#x2082;, sk&#x2083;)
+     &boxur;&boxh;&boxh; ML-DSA-65.Sign    &rarr; &sigma;&#x2081;  (3,309 B)
+     &boxur;&boxh;&boxh; FALCON-512.Sign   &rarr; &sigma;&#x2082;  (~666 B)     [parallel]
+     &boxur;&boxh;&boxh; SLH-DSA.Sign      &rarr; &sigma;&#x2083;  (17,088 B)
+        &darr;
+   Compact receipt R = (v, flags, c, &tau;)     &larr; 42-byte receipt
+        &darr;
+   Bitcoin anchor: m(S) &rarr; Taproot tweak     &larr; 0 marginal bytes
+                   or    &rarr; OP_RETURN          &larr; 34 bytes
+</pre>
+<p style="font-size:0.78rem;color:var(--gray);margin:0.5rem 0 0 0;">Persistent footprint: 32 bytes on-chain + 42 bytes off-chain = <strong>74 bytes</strong>. Ephemeral bundle (~21 KB) stored off-chain, retrievable by R.c.</p>
+</div>
+
+<h3 class="subsection-title" id="s4-1">4.1. Mint</h3>
+
+<p>Given a computation type t and a computation result r, a signer runs Mint(t, r) &rarr; S as follows.</p>
+
+<ol>
+  <li>Compute h &larr; SHA3-256(canonical encoding of r).</li>
+  <li>Sample &eta; &larr; {0,1}<sup>128</sup> uniformly from a cryptographically secure random source.</li>
+  <li>Read &tau; &larr; current Unix time in milliseconds.</li>
+  <li>Set v &larr; 1.</li>
+  <li>Return S &larr; (v, t, h, &tau;, &eta;).</li>
+</ol>
+
+<h3 class="subsection-title" id="s4-2">4.2. Sign</h3>
+
+<p>Given a primitive S and a three-family key set (sk<sub>1</sub>, sk<sub>2</sub>, sk<sub>3</sub>), the signer runs Sign(S, sk<sub>1</sub>, sk<sub>2</sub>, sk<sub>3</sub>) &rarr; (R, &sigma;) as follows.</p>
+
+<ol>
+  <li>Compute m &larr; SHA3-256(canonical encoding of S).</li>
+  <li>Compute &sigma;<sub>1</sub> &larr; ML-DSA-65.Sign(sk<sub>1</sub>, m).</li>
+  <li>Compute &sigma;<sub>2</sub> &larr; FALCON-512.Sign(sk<sub>2</sub>, m).</li>
+  <li>Compute &sigma;<sub>3</sub> &larr; SLH-DSA-SHA2-128f.Sign(sk<sub>3</sub>, m).</li>
+  <li>Compute c using the domain-separated, length-prefixed construction of Definition 6 over (m, pk<sub>1</sub>, pk<sub>2</sub>, pk<sub>3</sub>, &sigma;<sub>1</sub>, &sigma;<sub>2</sub>, &sigma;<sub>3</sub>), where pk<sub>i</sub> is the public key corresponding to sk<sub>i</sub>.</li>
+  <li>Assemble R &larr; (1, 0x07, c, S.&tau;), where the flag byte 0x07 indicates the three families ML-DSA-65, FALCON-512, SLH-DSA-SHA2-128f.</li>
+  <li>Store (R.c &mapsto; (&sigma;<sub>1</sub>, &sigma;<sub>2</sub>, &sigma;<sub>3</sub>)) in the signer's ephemeral signature store.</li>
+  <li>Return (R, &sigma;).</li>
+</ol>
+
+<h3 class="subsection-title" id="s4-3">4.3. Verify</h3>
+
+<p>Given an attestation (S, R, &sigma;) and a three-family public key set (pk<sub>1</sub>, pk<sub>2</sub>, pk<sub>3</sub>), a verifier runs Verify(S, R, &sigma;, pk<sub>1</sub>, pk<sub>2</sub>, pk<sub>3</sub>) &rarr; {0, 1} as follows.</p>
+
+<ol>
+  <li>Check that |S| = 58 and |R| = 42. Reject otherwise.</li>
+  <li>Check that S.v = 1 and R.v = 1. Reject otherwise.</li>
+  <li>Check that S.&tau; = R.&tau;. Reject otherwise.</li>
+  <li>Compute m &larr; SHA3-256(canonical encoding of S).</li>
+  <li>Recompute the verification digest c' using the domain-separated construction of Definition 6 over (m, pk<sub>1</sub>, pk<sub>2</sub>, pk<sub>3</sub>, &sigma;<sub>1</sub>, &sigma;<sub>2</sub>, &sigma;<sub>3</sub>). Check that c' = R.c. Reject otherwise.</li>
+  <li>Check that ML-DSA-65.Verify(pk<sub>1</sub>, m, &sigma;<sub>1</sub>) = 1. Reject otherwise.</li>
+  <li>Check that FALCON-512.Verify(pk<sub>2</sub>, m, &sigma;<sub>2</sub>) = 1. Reject otherwise.</li>
+  <li>Check that SLH-DSA-SHA2-128f.Verify(pk<sub>3</sub>, m, &sigma;<sub>3</sub>) = 1. Reject otherwise.</li>
+  <li>Accept.</li>
+</ol>
+
+<p>Observe that the verifier has no interaction with the signer beyond the initial retrieval of the raw signature bundle indexed by R.c, and no interaction with the Bitcoin network or any other ledger. The verification is a pure function of the attestation, the public key set, and the signature bundle.</p>
+
+
+<!-- ============================== -->
+<!-- SECTION 5: Batched Merkle      -->
+<!-- ============================== -->
+<h2 class="section-title" id="s5">5. Batched Merkle Aggregation</h2>
+
+<p>The three-family signing cost is dominated by SLH-DSA-SHA2-128f at approximately 5 milliseconds per signature on a modern CPU core. A naive per-result signing scheme would therefore cap per-core throughput at approximately 200 attestations per second. We describe a Merkle aggregation construction that amortizes the signing cost across a batch of N results so that the per-result amortized cost decays as O(1/N).</p>
+
+<h3 class="subsection-title" id="s5-1">5.1. Construction</h3>
+
+<p>Let S<sub>1</sub>, S<sub>2</sub>, ..., S<sub>N</sub> be N primitives produced within a batching window. Each has an associated signing message m<sub>i</sub> = SHA3-256(canonical encoding of S<sub>i</sub>). The signer proceeds as follows.</p>
+
+<ol>
+  <li>Arrange the messages {m<sub>1</sub>, m<sub>2</sub>, ..., m<sub>N</sub>} as the leaves of a binary Merkle tree, padding to the next power of two with a domain-separated zero leaf if necessary.</li>
+  <li>Compute each leaf node as SHA3-256(0x00 || m<sub>i</sub>). Compute each internal node as SHA3-256(0x01 || left || right). The 0x00 leaf prefix and 0x01 internal prefix provide domain separation that prevents second-preimage attacks in which a leaf hash could otherwise be misinterpreted as an internal node hash.</li>
+  <li>Let &rho; be the resulting 32-byte Merkle root.</li>
+  <li>Mint a new primitive S<sub>batch</sub> whose h field is set to &rho; and whose t field is set to a batch-aggregation computation type (distinct from any of the leaf types).</li>
+  <li>Run Sign(S<sub>batch</sub>, ...) exactly once, producing (R<sub>batch</sub>, &sigma;<sub>batch</sub>).</li>
+</ol>
+
+<p>The persistent footprint of the entire batch is the persistent footprint of the single root attestation: 74 bytes. Per-leaf verification requires the verifier to obtain from the signer the log-depth Merkle path from leaf i to the root, which is &lceil;log<sub>2</sub>N&rceil; 32-byte sibling hashes, together with (S<sub>batch</sub>, R<sub>batch</sub>, &sigma;<sub>batch</sub>).</p>
+
+<h3 class="subsection-title" id="s5-2">5.2. Amortized Cost</h3>
+
+<p>The signing cost of a batch of N attestations is the constant cost of one three-family bundle, which is dominated by SLH-DSA-SHA2-128f at approximately 5 milliseconds. The amortized per-attestation signing cost is therefore 5 ms / N. At N = 1000, the amortized cost is 5 microseconds per attestation; at N = 10,000, it is 500 nanoseconds per attestation.</p>
+
+<p>The amortization has a latency cost: each leaf attestation must wait for the batching window to close before being signed. In practice the window length is a per-application choice; interactive workloads favor windows of 10 to 100 milliseconds, and bulk ingest workloads favor windows of seconds to tens of seconds. The construction imposes no upper bound on the batching window or on N; we have implemented batches of up to N = 2<sup>20</sup> in testing without difficulty.</p>
+
+<h3 class="subsection-title" id="s5-3">5.3. Unbounded Aggregation</h3>
+
+<p>We note that no structural property of the construction limits N. A batch of N = 2<sup>50</sup> attestations (approximately one quadrillion) has a persistent footprint of exactly 74 bytes, and per-leaf inclusion proofs are 50 32-byte sibling hashes plus the 42-byte compact receipt. We find this decoupling of persistent footprint from event volume to be one of H33-74's more useful properties in storage-expensive environments.</p>
+
+<!-- ============================== -->
+<!-- SECTION 6: Security            -->
+<!-- ============================== -->
+<h2 class="section-title" id="s6">6. Security</h2>
+
+<p>We informally state the security property of H33-74 and sketch the argument. A full proof is deferred to a long version of this paper.</p>
+
+<h3 class="subsection-title" id="s6-1">6.1. Informal Statement</h3>
+
+<div class="theorem-box">
+  <p><span class="thm-label">Theorem 1 (informal).</span> Let &#x1D49C; be a probabilistic polynomial-time adversary, classical or quantum, with oracle access to a signer holding a three-family key set (sk<sub>1</sub>, sk<sub>2</sub>, sk<sub>3</sub>). If &#x1D49C; produces an attestation (S*, R*, &sigma;*) that verifies under the signer's corresponding public key set, and S* was not produced by any prior invocation of Mint followed by a prior invocation of Sign at the signer, then &#x1D49C; must have produced valid signatures under all three of ML-DSA-65, FALCON-512, and SLH-DSA-SHA2-128f on the signing message m(S*).</p>
+</div>
+
+<p><strong>Sketch.</strong> Observe that the verifier rejects an attestation unless the recomputed verification digest matches R*.c (step 5 of Verify) and unless all three individual signature checks pass (steps 6&ndash;8). The verification digest is a domain-separated, length-prefixed SHA3-256 hash over the signing message, all three public keys, and all three signatures. By the collision resistance of SHA3-256, &#x1D49C; cannot substitute a different combination of keys or signatures for the one whose digest equals R*.c without finding a SHA3-256 collision, which is infeasible under our assumptions. Therefore &#x1D49C;'s submitted triple must contain genuine signatures under all three schemes on the signing message m(S*).</p>
+
+<p>By the EUF-CMA (Existential Unforgeability under Chosen-Message Attack &mdash; the standard security definition for digital signatures, meaning no adversary can forge a valid signature on any new message, even after observing signatures on messages of its choice) security of ML-DSA-65, FALCON-512, and SLH-DSA-SHA2-128f respectively, each individual signature must have been produced by the corresponding signing key holder on the specific message m(S*). By hypothesis, S* was not produced by any prior Mint invocation. For m(S*) to coincide with a previously signed message m(S') where S' &ne; S*, the adversary would need SHA3-256(S*) = SHA3-256(S') &mdash; a collision in SHA3-256, which is infeasible under the collision resistance of SHA3-256. Therefore m(S*) is a fresh message that was never previously signed, and &#x1D49C; forged at least one of the three signatures on a fresh message.</p>
+
+<div class="theorem-box">
+  <p><span class="thm-label">Corollary 1.</span> To forge an attestation, &#x1D49C; must either (a) find a SHA3-256 collision in the signing-message computation or the receipt-binding digest, or (b) produce a valid signature under at least one of the three signature families on a message that was never signed by the legitimate key holder. The construction's security therefore rests on four assumptions: the collision resistance of SHA3-256, the EUF-CMA security of ML-DSA-65 (MLWE), the EUF-CMA security of FALCON-512 (NTRU-SIS), and the EUF-CMA security of SLH-DSA-SHA2-128f (SHA2-256 pre-image resistance). Because the all-three verification policy requires all three signature checks to pass, an adversary who cannot find a SHA3-256 collision must forge under all three schemes simultaneously.</p>
+</div>
+
+<p>To state this precisely: H33-74's security reduces to the conjunction of three independently assumed hardness problems. Practical forgery requires cryptanalytic compromise across all active families &mdash; an advance in MLWE that breaks ML-DSA does not help the adversary forge FALCON (NTRU-SIS) or SLH-DSA (hash pre-image), and vice versa. We do not claim a formal composition theorem; the independence of these three assumptions is empirically supported by the current state of cryptanalytic knowledge but is not a proven separation result. We treat this as an open problem in &sect;11.1 and flag the algorithm_flags rotation mechanism (&sect;6.2, &sect;11.8) as the operational response if a future cryptanalytic result narrows the effective independence. If any one family falls, the remaining two provide continued protection during rotation. If two fall simultaneously, the third provides a migration window. Only a simultaneous break of all three &mdash; which requires independent advances in MLWE, NTRU-SIS, and hash pre-image resistance on the same timeline &mdash; produces a forgery. We consider this a reasonable engineering bet, not a provable theorem.</p>
+
+<h3 class="subsection-title" id="s6-2">6.2. Discussion</h3>
+
+<p>The three-family construction is not the only possible choice. One could imagine a two-family bundle (less expensive), a four-family bundle (more conservative), or a threshold-of-three bundle (allowing one family to fail gracefully). We chose the strict all-three policy because it admits the simplest security argument and because the cost of the third signature is amortized to microseconds by the batching construction of Section 5. We would reconsider this choice if a future cryptanalytic development reduced the effective independence of the three families, and the algorithm_flags field of the compact receipt (see Definition 6) is structured to allow a smooth transition to different family compositions without changing the wire format.</p>
+
+<p>We note a practical concern with FALCON-512's floating-point discrete Gaussian sampler, which requires constant-time floating-point emulation on platforms without hardware FP support and presents a known side-channel surface. FALCON+ (Espitau et al., 2022) replaces the floating-point sampler with an integer-only variant that eliminates FP emulator friction, reduces the side-channel surface, and avoids the security reduction penalty associated with FP rounding. An integer-only FALCON variant is a candidate for a future family rotation via the algorithm_flags mechanism. The wire format and persistent footprint are unaffected by this change; only the ephemeral signature bytes and the algorithm_flags byte change.</p>
+
+<p>We observe that the algorithm_flags byte in Definition 6 already provides the structural foundation for a crypto-agile architecture aligned with NIST's Crypto Agility guidance. The 8-bit flags field supports exactly 8 algorithm slots. The three-family reference deployment uses value 0x07 (7 = 4 + 2 + 1), leaving five slots available for future algorithm registration. This bitmask architecture means that disabling a compromised family requires flipping a single bit &mdash; no software update, no flag-day cutover, no deployed-binary reissuance. Adding a new NIST-standardized family in 2030 requires only registering it in an unused slot and flipping the corresponding bit. The entire deployed infrastructure continues functioning under any valid bitmask combination. Note that this agility applies to new attestations; the question of how existing primitives are re-verified during a rotation window is the subject of &sect;11.6. This resolves the independence question of the preceding paragraph in the best possible way: it is not a fixed-time tradeoff between assumption diversity and NIST-level parity but an operationally agile framework in which the set of active families is a runtime configuration parameter, not a compile-time constant. See &sect;11.8 for a more detailed treatment of this architecture.</p>
+
+<h3 class="subsection-title" id="s6-3">6.3. Honest Security-Level Disclosure</h3>
+
+<p>The NIST security category of the bundle is bounded below by the weakest family. Both FALCON-512 and SLH-DSA-SHA2-128f are at NIST Level 1 (approximately 128-bit classical security); ML-DSA-65 is at NIST Level 3. The bundle is therefore at NIST Level 1 in the formal NIST sense. This is a statement about the per-family security margin &mdash; the quantitative strength of any single family in the bundle. It is a separate property from the forgery requirement, which demands that an attacker break all three families simultaneously to produce a valid attestation. The NIST level bounds the strength of the weakest link; the three-family requirement bounds the attack surface for forgery. Both properties hold simultaneously and should not be conflated.</p>
+
+<p>We make this disclosure because we have seen the three-family construction occasionally described as "three Level 3 families," and that description is incorrect. The correct claim is that primitive forgery requires breaking three independent hardness assumptions, each of which is at least NIST Level 1. Hardness-assumption diversity is the design property we are relying on, not NIST-level parity. We consider three independent Level 1 assumptions to provide a qualitatively different security property than a single assumption at any NIST level, because a cryptanalytic advance against one family of the three-family bundle leaves the other two intact, whereas the same advance against a single-family scheme at any level is a total break. We do not claim this constitutes formally stronger security in the NIST-level sense; we claim it provides a different and complementary form of resilience.</p>
+
+<p>A straightforward upgrade path to uniform NIST Level 3 uses FALCON-1024 and SLH-DSA-SHA2-192f in place of the Level 1 variants. For deployments requiring uniform NIST Level 5 &mdash; the maximum security category defined by NIST &mdash; the reference implementation provides an optional three-family Level 5 composition: ML-DSA-87 (FIPS 204, Level 5, 4,627-byte signature, 2,592-byte public key), FALCON-1024 (Draft FIPS 206, Level 5, ~1,280-byte signature, 1,793-byte public key), and SLH-DSA-SHA2-256f (FIPS 205, Level 5, 49,856-byte signature, 64-byte public key). The Level 5 bundle totals approximately 55,763 bytes of ephemeral signatures &mdash; roughly 2.6&times; the Level 1 bundle &mdash; and signing is dominated by SLH-DSA-SHA2-256f at approximately 4&times; the Level 1 signing latency. This composition eliminates the "bounded by weakest at Level 1" footnote entirely: all three families are uniformly Level 5, and forgery requires breaking all three simultaneously. The Level 5 option is intended for high-value attestations (such as proof-of-life bindings for large Bitcoin holdings) where the additional signing cost is negligible relative to the value being protected. The wire format and 74-byte persistent footprint are identical for both compositions; only the algorithm_flags byte and the ephemeral signature bundle differ.</p>
+
+<p>We have not committed to a default upgrade from Level 1 to Level 5 in the production deployment because the current bundle's effective security is adequate under all threat models we have considered, and the Level 5 signing cost would reduce batched throughput by approximately 4&times;. The reference commercial implementation intends to publish a migration notice with 90 days of lead time before any algorithm upgrade takes effect; specific notice obligations are governed by individual commercial license agreements.</p>
+
+<h3 class="subsection-title" id="s6-4">6.4. Why This Construction</h3>
+
+<p>We address the natural question of why H33-74 uses a strict all-three signature policy rather than one of several simpler alternatives.</p>
+
+<p><strong>Single-family PQ signature + hash commitment.</strong> A single post-quantum signature scheme (e.g., ML-DSA-65 alone) over a hash commitment provides attestation with lower signing cost. However, it creates a single point of failure: one cryptanalytic advance against the chosen family produces a total break. If MLWE is broken, every attestation ever signed under ML-DSA is forgeable. The three-family construction exists precisely to avoid this single-point-of-failure property. The additional cost of the second and third signatures is amortized to microseconds per result by the batching construction of &sect;5.</p>
+
+<p><strong>Threshold (2-of-3) schemes.</strong> A threshold policy that accepts an attestation when any two of the three families verify would provide graceful degradation if one family is compromised. However, it introduces the verification ambiguity we flag in &sect;11.6: when one family is known to be broken, a verifier encountering a pre-rotation attestation must decide which two families to trust, and that decision has security implications that have not been formally analyzed. The strict all-three policy avoids this decision entirely. We consider threshold verification a direction worth exploring (&sect;11.6) but premature to deploy before the rotation semantics are specified.</p>
+
+<p><strong>Aggregated signature schemes.</strong> An aggregate or multi-signature scheme that combines three signatures into one shorter object would reduce the ephemeral bundle size. No NIST-standardized post-quantum aggregate signature scheme currently exists. Building on non-standardized primitives would defeat the purpose of selecting three families from the NIST PQC program. If a suitable aggregate scheme is standardized in the future, the algorithm_flags mechanism (&sect;11.8) can accommodate it without changing the wire format.</p>
+
+<p><strong>SNARK/STARK-based attestations.</strong> A ZK-SNARK or ZK-STARK proof of correct computation, without a signature bundle, could provide computation-result attestation with succinctness. However, SNARKs require a trusted setup (which H33-74 avoids), and STARKs at the scale required for general computation verification are not yet practical for arbitrary computation types (&sect;11.9). The proof-of-life construction in &sect;9.9 demonstrates a STARK-based attestation for a specific computation (secp256k1 discrete log), but generalizing this to the full range of computation types H33-74 supports remains an open problem. Additionally, neither SNARKs nor STARKs provide assumption diversity &mdash; they rely on a single hardness assumption (knowledge-of-exponent or collision resistance, respectively).</p>
+
+<p><strong>Why these three families specifically.</strong> The three families were chosen to maximize assumption diversity across distinct mathematical domains. ML-DSA-65 relies on the Module Learning With Errors (MLWE) problem over structured polynomial modules. FALCON-512 relies on the Short Integer Solution (SIS) problem over NTRU lattice rings. Both are lattice-based, but they operate over different algebraic objects: MLWE works in the module lattice R<sub>q</sub><sup>k</sup> where R<sub>q</sub> = Z<sub>q</sub>[X]/(X<sup>n</sup>+1), while NTRU-SIS works in the ring Z<sub>q</sub>[X]/(X<sup>n</sup>+1) with the specific NTRU structure f&middot;g<sup>&minus;1</sup> mod q. The best known attacks against each exploit structure-specific properties &mdash; BKZ lattice reduction for MLWE, and NTRU-specific combinatorial attacks for FALCON &mdash; that do not automatically transfer between the two constructions. The NIST PQC evaluation committee assessed these as independent candidates and selected both into the final standard precisely because their cryptanalytic attack surfaces are believed to diverge. SLH-DSA-SHA2-128f is categorically different: it has no algebraic structure whatsoever. Its security reduces entirely to the pre-image resistance of SHA2-256, a Merkle-Damg&aring;rd hash function with thirty years of public cryptanalysis. A lattice breakthrough that simultaneously breaks both ML-DSA and FALCON has zero impact on SLH-DSA, because hash functions have no lattice structure to attack. This is why the three-family bundle provides meaningful assumption diversity rather than merely three instances of the same bet.</p>
+
+<p><strong>Rejected alternative families.</strong> Code-based schemes (Classic McEliece) were considered but rejected due to public key sizes exceeding 250 kilobytes, which would make the key distribution mechanism impractical for most deployments. Isogeny-based schemes (SIKE/SIDH) were eliminated after the Castryck-Decru attack (2022) broke the underlying isogeny problem in polynomial time. Multivariate schemes (Rainbow) were eliminated after Ward Beullens's attack (2022) broke Rainbow at all NIST-submitted parameter sets. The three surviving families &mdash; module lattices, NTRU lattices, and hash-based &mdash; represent the three hardness classes that have withstood the NIST PQC evaluation process without a practical break.</p>
+
+<p><strong>Summary.</strong> The all-three strict verification policy over NIST-standardized families was chosen because it (a) provides assumption diversity across three structurally distinct hardness classes, (b) uses only families that survived the NIST PQC evaluation without a practical break, (c) admits a simple security argument without threshold ambiguity, and (d) incurs a signing cost that is amortized to microseconds per result by batching. We consider this the most defensible engineering choice given the current state of post-quantum standardization.</p>
+
+<!-- ============================== -->
+<!-- SECTION 7: Efficiency          -->
+<!-- ============================== -->
+<h2 class="section-title" id="s7">7. Efficiency</h2>
+
+<p>This section reports measured signing and verification costs from the reference implementation of H33-74 running on a production deployment. We present these numbers as evidence that H33-74 is practically deployable; we do not claim they are optimal or close to optimal. All figures are drawn from a benchmark run conducted on 2026-04-13 on AWS c8g.metal-48xl (Graviton4); raw benchmark logs and configuration details are retained for independent review (see Appendix A). These figures are not performance guarantees for customer deployments.</p>
+
+<h3 class="subsection-title" id="s7-1">7.1. Signing Cost</h3>
+
+<p>Per-bundle signing time on a single core of an AWS Graviton4 (ARM Neoverse V2) running at production conditions:</p>
+
+<table>
+  <thead>
+    <tr><th>Algorithm</th><th>Time</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>ML-DSA-65</td><td>&asymp; 300 &mu;s</td></tr>
+    <tr><td>FALCON-512</td><td>&asymp; 150 &mu;s</td></tr>
+    <tr><td>SLH-DSA-SHA2-128f</td><td>&asymp; 5 ms</td></tr>
+    <tr><td>Three-family bundle (unbatched)</td><td>&asymp; 5.5 ms</td></tr>
+    <tr><td>Compact receipt assembly</td><td>&lt; 5 &mu;s</td></tr>
+  </tbody>
+</table>
+
+<p>The three-family bundle is dominated by SLH-DSA-SHA2-128f. Per-core unbatched throughput is therefore approximately 180 bundles per second. These figures are from the Graviton4 metal benchmark of 2026-04-13 and differ from the single-shot times reported in &sect;3.2 (760 &micro;s / 183 &micro;s / 24,083 &micro;s), which were measured on a development workstation during the live Bitcoin mainnet anchoring. The approximately 5&times; improvement in SLH-DSA signing time (24 ms &rarr; 5 ms) reflects two factors: the Graviton4's hardware NEON crypto acceleration extensions, and the release-mode compilation flags (<code>opt-level=3</code>, <code>lto=fat</code>, <code>codegen-units=1</code>) which enable aggressive inlining of the SHA2-256 hash chains that dominate SLH-DSA's signing cost. The Graviton4 figures are the authoritative production numbers.</p>
+
+<h3 class="subsection-title" id="s7-2">7.2. Batched Throughput</h3>
+
+<p>A production deployment running the reference implementation on a 192-vCPU AWS c8g.metal-48xl instance (Graviton4, us-east-1), with batches of N = 32 results per three-family bundle and 96 concurrent workers, sustained over a 30-second measurement window the following throughput numbers on 2026-04-13:</p>
+
+<table>
+  <thead>
+    <tr><th>Configuration</th><th>Auth/sec</th><th>Per-auth</th><th>Per-batch (32 users)</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Metal, full pipeline, raw DashMap data structure</td>
+      <td><strong>2,216,488</strong></td>
+      <td>35 &mu;s</td>
+      <td>1,128 &mu;s</td>
+    </tr>
+    <tr>
+      <td>Metal, full pipeline, CacheeEngine overlay (L0 + CacheeLFU + DashMap)</td>
+      <td><strong>2,175,029</strong></td>
+      <td>35 &mu;s</td>
+      <td>~1,130 &mu;s</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The overhead of the CacheeEngine overlay relative to the raw DashMap data structure is approximately 1.87% in the full pipeline &mdash; inside run-to-run variance, and we consider the two configurations operationally equivalent. The CacheeEngine adds an admission sketch and observability instrumentation on top of the underlying concurrent hash map; the cost of this overlay is statistically invisible at pipeline scale.</p>
+
+<p>The batched configuration amortizes the three-family signing cost described in &sect;7.1 across 32 results per signing event. The remaining pipeline time is dominated by the fully homomorphic encryption inner product computation that produces the data being attested &mdash; H33-74's signing overhead is not the pipeline bottleneck.</p>
+
+<p>At a sustained 2,175,029 authentications per second and commodity cloud on-demand pricing of approximately $2.30 per instance-hour, the hardware cost of a single signed authentication is approximately 2.9 &times; 10<sup>&minus;10</sup> United States dollars. We offer this figure as an existence proof that H33-74 is economically deployable at high volume; we do not claim it is the minimum achievable cost.</p>
+
+<h3 class="subsection-title" id="s7-3">7.3. Pipeline Component Breakdown</h3>
+
+<p>The full end-to-end pipeline latency on the Apr 13 metal run decomposes as follows (per 32-user batch). <strong>Important:</strong> the three signing operations run in parallel, not sequentially. The wall-clock bottleneck is SLH-DSA at ~4,891 &mu;s. With batching, one three-family parallel signing event covers 32 results, yielding an amortized cost of ~4,891 &mu;s &divide; 32 &asymp; 153 &mu;s per result for the signing component, plus digest and overhead. The batch attestation wall-clock time of 189 &mu;s per result reflects this parallel-then-amortize model. The sub-rows in the table below show per-signature CPU time, not wall-clock contribution to the batch.</p>
+
+<table>
+  <thead>
+    <tr><th>Stage</th><th>Wall-Clock Latency</th><th>% Pipeline</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="pipeline-bar bar-gold" style="width:83%"></span> FHE batch verify (32 users)</td>
+      <td>937 &mu;s</td>
+      <td>83%</td>
+    </tr>
+    <tr>
+      <td><span class="pipeline-bar bar-green" style="width:17%"></span> Batch attestation (wall-clock)</td>
+      <td>189 &mu;s</td>
+      <td>17%</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr><th>Parallel Signing Breakdown (CPU time per signature)</th><th>CPU Time</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>&emsp; SHA3-256 digest</td><td>~1 &mu;s</td></tr>
+    <tr><td>&emsp; ML-DSA-65 sign</td><td>~268 &mu;s</td></tr>
+    <tr><td>&emsp; FALCON-512 sign</td><td>~143 &mu;s</td></tr>
+    <tr><td>&emsp; SLH-DSA sign (wall-clock bottleneck)</td><td>~4,891 &mu;s</td></tr>
+    <tr><td>&emsp; ML-DSA-65 verify</td><td>~112 &mu;s</td></tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr><th>Stage</th><th>Latency</th><th>% Pipeline</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="pipeline-bar bar-blue" style="width:2%"></span> ZKP cached lookup (CacheeEngine L0)</td>
+      <td>1.9 &mu;s</td>
+      <td>0.2%</td>
+    </tr>
+    <tr style="border-top: 2px solid var(--border);">
+      <td><strong>Total batch latency (32 users)</strong></td>
+      <td><strong>1,128 &mu;s</strong></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>Per-auth latency</strong></td>
+      <td><strong>35 &mu;s</strong></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The fully homomorphic encryption computation dominates the pipeline at 83%. The three-family signing bundle contributes approximately 17% &mdash; reduced from earlier measurements by the restoration of hardware NEON crypto acceleration. The CacheeEngine L0 lookup is statistically invisible at the pipeline scale.</p>
+
+<h3 class="subsection-title" id="s7-4">7.4. Optimizations Discovered During Load Testing</h3>
+
+<p>We owe the reader a candid account of the cache layer's behavior during initial integration, because the first attempt produced a throughput figure that was approximately one-ninth of the raw baseline, and the investigation that followed uncovered three distinct instrumentation bottlenecks in the cache's observability code. All three produced correct output at every concurrency level; the issue was throughput degradation caused by lock contention in the instrumentation path, not in the cache logic itself. The optimizations are in production now, and the 2,175,029 auth/sec figure in &sect;7.2 reflects the cache with all three optimizations applied. We describe the investigation here because honesty about production performance investigation is more useful to the community than polished benchmark claims.</p>
+
+<p>The first integration run, under the same 96-worker sustained load that produced the raw baseline of 2,216,488 auth/sec, produced only 183,828 auth/sec when the cache layer was interposed. This is a 12&times; regression, and on its face would suggest the cache layer was fundamentally misdesigned.</p>
+
+<p>The investigation revealed that all three root causes were contended write locks in the cache's instrumentation code, not in the admission sketch or the cache's main data structures. No incorrect output was produced at any stage; the cache returned correct results throughout, but at a fraction of the expected throughput. We describe the three optimizations individually.</p>
+
+<div class="bug-callout">
+  <h4>Optimization 1: Statistics instrumentation lock contention.</h4>
+  <p>The cache's internal statistics counters were protected by a shared lock that serialized the entire hot path under high concurrency. The fix replaced the shared lock with lock-free counters. Throughput rose to 395,816 auth/sec (a 115% improvement, but still far below the baseline).</p>
+</div>
+
+<div class="bug-callout">
+  <h4>Optimization 2: Metrics collector lock contention.</h4>
+  <p>The cache's metrics collection layer held a redundant shared lock around an already-atomic data structure. Removing the redundant lock and switching non-critical bookkeeping to skip-on-contention raised throughput to approximately 1,400,000 auth/sec.</p>
+</div>
+
+<div class="bug-callout">
+  <h4>Optimization 3: Pattern detector hot-path write lock.</h4>
+  <p>A workload pattern detector was taking a write lock on every cache read, despite only needing the data periodically. Adding a sampling rate reduced lock contention substantially with negligible impact on pattern detection quality. After this fix the final throughput settled at 2,175,029 auth/sec, which is 1.87% below the baseline and inside normal run variance.</p>
+</div>
+
+<p>The cache's admission control mechanism was not involved in any of the three bottlenecks and remained fully active throughout the final 2,175,029 auth/sec run.</p>
+
+<p>We take two lessons from this investigation. First, instrumentation and observability code must be lock-free at high concurrency &mdash; a shared lock on the hot path is almost always wrong at scale, even when the code inside the lock is trivial. Second, load testing at the target concurrency is not optional. None of these bottlenecks were visible at low-concurrency benchmarks.</p>
+
+<p>The reference cache implementation with all three optimizations applied is available under a commercial license.</p>
+
+<h3 class="subsection-title" id="s7-5">7.5. Verification Cost</h3>
+
+<p>Verification time on a single core of a commodity client (Apple M4 Max laptop) for a single three-family attestation, including the SHA3-256 recomputation, the receipt structural checks, and the three signature verifications:</p>
+
+<table>
+  <thead>
+    <tr><th>Operation</th><th>Time</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>SHA3-256 recomputation</td><td>&lt; 1 &mu;s</td></tr>
+    <tr><td>ML-DSA-65 verify</td><td>&asymp; 150 &mu;s</td></tr>
+    <tr><td>FALCON-512 verify</td><td>&asymp; 100 &mu;s</td></tr>
+    <tr><td>SLH-DSA-SHA2-128f verify</td><td>&asymp; 300 &mu;s</td></tr>
+    <tr><td>Structural checks</td><td>&lt; 10 &mu;s</td></tr>
+    <tr><td><strong>Full verify, wall-clock</strong></td><td><strong>&asymp; 593 &mu;s</strong></td></tr>
+  </tbody>
+</table>
+
+<p>The verification cost is dominated by the three individual signature verifications, which are independent and parallelizable.</p>
+
+<h3 class="subsection-title" id="s7-6">7.6. Cache Memory Footprint</h3>
+
+<p>The reference cache's admission sketch is a Count-Min Sketch whose memory footprint is invariant in the cardinality of the keyspace being tracked. A standalone benchmark measured the sketch's memory footprint at three keyspace sizes and compared it with the baseline memory of a concurrent hash map storing the same keys:</p>
+
+<table>
+  <thead>
+    <tr><th>Keyspace</th><th>Admission sketch</th><th>DashMap baseline</th><th>Ratio</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>100 K</td><td>512.17 KiB</td><td>6.20 MiB</td><td>12.4&times;</td></tr>
+    <tr><td>1 M</td><td>512.17 KiB</td><td>61.99 MiB</td><td>123.9&times;</td></tr>
+    <tr><td>10 M</td><td>512.17 KiB</td><td>619.89 MiB</td><td>1,239&times;</td></tr>
+  </tbody>
+</table>
+
+<p>The sketch's constant footprint is a direct consequence of its probabilistic construction. The admission decision at 10 million keys costs the same memory as the admission decision at 100 thousand keys, and we consider this memory-scaling property to be a defining feature of the cache design for deployments that track very large keyspaces.</p>
+
+<h3 class="subsection-title" id="s7-7">7.7. Persistent Footprint</h3>
+
+<p>The persistent footprint is 74 bytes per attestation for single results, and 74 bytes per batch plus 32&middot;&lceil;log<sub>2</sub>N&rceil; bytes per leaf inclusion proof for batched attestations. At N = 2<sup>20</sup>, this is 74 bytes for the root attestation and 640 bytes per leaf inclusion proof. The ephemeral footprint (the raw signature bundle) is approximately 21 kilobytes per bundle and is held in an off-chain signature store indexed by the receipt's commitment.</p>
+
+<h3 class="subsection-title" id="s7-8">7.8. Functional Verification</h3>
+
+<p>We report the results of five independent functional proof tests that verify H33-74's cryptographic properties hold end-to-end with real data, not just synthetic test vectors. All five tests pass in under 10 milliseconds on a commodity laptop (Apple M4 Max). The test source is published in the reference implementation crate at <code>tests/functional_proof.rs</code>.</p>
+
+<div class="test-card">
+  <h4>Test 1: Binding proof.</h4>
+  <p>A real document (a 59-byte SEC filing excerpt) is minted as an ArchiveSign primitive. The test independently verifies: (a) H33-74's h field equals SHA3-256 of the document, (b) verify_binding returns true for the original document, (c) the signing message equals SHA3-256 of the serialized primitive bytes, and (d) the OP_RETURN script contains exactly the signing message at bytes [2..34]. The full chain document &rarr; H(r) &rarr; primitive.h &rarr; SHA3-256(S) &rarr; OP_RETURN is verified at every link. Persistent footprint: 74 bytes.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 2: Tamper detection.</h4>
+  <p>Six tamper scenarios are tested against a MedVaultPhi primitive binding a patient record: (a) flipping one bit of the document causes verify_binding to reject, (b) an empty document rejects, (c) a completely different document rejects, (d) flipping one bit in the serialized primitive changes the signing message, (e) flipping the computation type byte changes the signing message, and (f) the compact receipt rejects verification against a signing message that does not match the original. All six tampering attempts are detected.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 3: Domain separation.</h4>
+  <p>Twelve computation types are tested with identical payload data, identical timestamps, and identical nonces. The test confirms that all 12 produce mutually distinct signing messages &mdash; 66 cross-type comparisons, zero collisions. This proves that cross-domain replay (using a BiometricAuth attestation as if it were a BitcoinUtxo attestation) is cryptographically impossible: the computation type byte is mixed into the primitive before hashing, and any change to it produces a completely different signing message.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 4: ZK over primitive tag.</h4>
+  <p>A BitcoinUtxo primitive is constructed from a 64-byte proof-of-reserves computation result. The test simulates the six constraints that a STARK circuit would enforce over a committed 58-byte private witness, given only the 32-byte public signing message: (a) SHA3-256(witness) equals the public input, (b) the version byte is 0x01, (c) the computation type is 0x06, (d) the content hash matches the claimed computation result, (e) the timestamp is within the last hour, and (f) the nonce is non-zero. A Fiat-Shamir challenge is derived from a transcript binding the public input. All six constraints pass. This test establishes the constraint structure for a future STARK proof that would prove knowledge of a valid primitive without revealing its nonce or timestamp.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 5: Receipt-to-chain verification.</h4>
+  <p>A LegalEvidence primitive is minted, signed, and attested. The test independently verifies: (a) the compact receipt is exactly 42 bytes with version 0x01 and algorithm flags 0x07 (three families), (b) the signing message recomputed from the primitive bytes matches the on-chain hash, (c) the receipt's verification_hash recomputed from the signing message, public keys, and signatures matches the receipt's stored hash at bytes [1..33], (d) H33-74's content binding to the original document holds, and (e) the full verification chain &mdash; document &rarr; content hash &rarr; primitive &rarr; signing message &rarr; OP_RETURN, and separately signing message + public keys + signatures &rarr; verification hash &rarr; receipt &mdash; is intact at every link.</p>
+</div>
+
+<h3 class="subsection-title" id="s7-9">7.9. Stress Tests and Limits</h3>
+
+<p>We report the results of ten additional tests that probe H33-74's behavior under adversarial inputs, concurrency, scale, and timing analysis. All ten tests pass. The test source is published in the reference implementation crate at <code>tests/stress_and_limits.rs</code>. Combined with the five functional proofs in &sect;7.8, the reference implementation passes 100 tests with zero failures across the full crate.</p>
+
+<div class="test-card">
+  <h4>Test 1: Maximum input size.</h4>
+  <p>Computation results ranging from 1 byte to 10 megabytes are minted as primitives. Every input produces a 58-byte primitive with a correct SHA3-256 content hash. H33-74 is size-invariant: a 10 MB document and a 1-byte status code produce identically sized attestations.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 2: Empty and malicious inputs.</h4>
+  <p>Empty input is rejected. All-zero, all-0xFF, embedded-null, and repeating-pattern inputs are accepted and produce correct primitives. Invalid deserialization inputs are rejected: wrong sizes (0, 57, 59, 1000 bytes), wrong version byte (0x02), and unregistered computation type (0xFE) all return errors.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 3: Nonce uniqueness under concurrency.</h4>
+  <p>Ten thousand primitives are generated in rapid succession with identical payload data. Every nonce, every primitive, and every signing message is unique &mdash; zero collisions across 10,000 mints. At a nonce space of 2<sup>128</sup>, a birthday collision requires approximately 2<sup>64</sup> mints; this test confirms the random source produces no degenerate output at the tested scale.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 4: Timestamp field limits.</h4>
+  <p>Timestamps of 0 (Unix epoch), 1, u64::MAX (year 584,942,417), and a known 2026 reference value are all preserved exactly in big-endian encoding. The timestamp field does not overflow, truncate, or silently wrap at any tested value.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 5: Cross-platform determinism.</h4>
+  <p>A primitive constructed from the SPEC.md known-answer vector (version 0x01, type BiometricAuth, commitment [0xAB; 32], timestamp 1744156800000, nonce [0xCD; 16]) produces byte-identical output to the published specification. The signing message matches the hardcoded SHA3-256 digest. This test confirms that the serialization is deterministic across platforms; the same test runs on x86, ARM, and WASM targets.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 6: Merkle tree at scale.</h4>
+  <p>A Merkle tree with 65,536 leaves (2<sup>16</sup>) is constructed. Inclusion proofs for the first, middle, and last leaf all verify correctly. Proof depth is 16 levels (512 bytes per proof). A wrong-leaf test confirms that an incorrect leaf fails verification. The construction's domain separation (0x00 leaf prefix, 0x01 internal prefix) prevents second-preimage attacks at the tested scale.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 7: Receipt forgery resistance.</h4>
+  <p>A legitimate receipt is verified, then six forgery attacks are attempted: (a) wrong public key, (b) wrong signature, (c) wrong signing message, (d) swapped signature families (Dilithium signature presented as FALCON), (e) truncated signature, and (f) bit-flip in the verification hash. All six are rejected. The receipt's verification_hash commits to the exact signing message, the exact public keys, and the exact signatures via a domain-tagged, length-prefixed SHA3-256 digest; any modification to any component produces a different hash.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 8: Constant-time verification.</h4>
+  <p>The receipt verification path is timed over 10,000 iterations for both valid and invalid inputs. Valid verification: 2,155 microseconds per iteration. Invalid verification (wrong signing message): 2,162 microseconds per iteration. The ratio is 1.003 &mdash; within 0.3% &mdash; confirming that the verification path does not leak timing information correlated with input correctness. The implementation uses <code>subtle::ConstantTimeEq</code> for all hash comparisons to prevent side-channel attacks.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 9: Signature size validation against NIST specifications.</h4>
+  <p>ML-DSA-65 (FIPS 204): 3,309 bytes. FALCON-512 (Draft FIPS 206): bounded by 666 bytes. SLH-DSA-SHA2-128f (FIPS 205): 17,088 bytes. Total three-family bundle: 21,063 bytes. Distillation ratio: 284.6:1 (21,063 ephemeral &rarr; 74 persistent). All sizes match the published NIST parameter specifications.</p>
+</div>
+
+<div class="test-card">
+  <h4>Test 10: Size invariance.</h4>
+  <p>Six inputs ranging from 1 byte to 1 megabyte, across six computation types, all produce primitives of exactly 58 bytes, signing messages of exactly 32 bytes, and compact receipts of exactly 42 bytes. The output size is independent of the input size and the computation type. This is the defining property that makes H33-74 viable in storage-constrained environments: the attestation cost is O(1) in data volume.</p>
+</div>
+
+<!-- ============================== -->
+<!-- SECTION 7.10: Live Anchor Test -->
+<!-- ============================== -->
+<h3 class="subsection-title" id="s7-10">7.10. Live Bitcoin Anchor Test</h3>
+
+<p>The live Bitcoin mainnet anchor test is presented in &sect;3.2 as a construction proof. The transaction ID is <code>7f8d9ef2d5625d7e3acbc269daac21087ce6b7d77f8e4ec369aabdcdb028b4a7</code> and is independently verifiable on any Bitcoin full node or block explorer.</p>
+
+<!-- ============================== -->
+<!-- SECTION 7.11: NIST KAT         -->
+<!-- ============================== -->
+<h3 class="subsection-title" id="s7-11">7.11. NIST KAT Validation</h3>
+
+<p>We report the results of 18 Known Answer Test (KAT) validations against the three post-quantum signature families used in H33-74's three-family bundle. These tests verify that the pqcrypto crate implementations &mdash; which wrap the PQClean C reference implementations &mdash; produce correct keypairs, valid signatures, and proper rejection of tampered or misattributed signatures. All 18 tests pass. Combined with the 5 functional proofs (&sect;7.8), 10 stress tests (&sect;7.9), and the live mainnet anchor (&sect;3.2), the reference implementation passes 118 tests with zero failures across the full crate.</p>
+
+<table>
+<thead><tr><th>Family</th><th>NIST Standard</th><th>Public Key</th><th>Signature</th><th>Sign/Verify</th><th>Tamper Reject</th><th>Wrong Key</th></tr></thead>
+<tbody>
+<tr><td>ML-DSA-65</td><td>FIPS 204</td><td>1,952 B</td><td>3,309 B</td><td>PASS</td><td>PASS</td><td>PASS</td></tr>
+<tr><td>FALCON-512</td><td>Draft FIPS 206</td><td>897 B</td><td>649&ndash;661 B (max 666)</td><td>PASS</td><td>PASS</td><td>PASS</td></tr>
+<tr><td>SLH-DSA-SHA2-128f</td><td>FIPS 205</td><td>32 B</td><td>17,088 B</td><td>PASS</td><td>PASS</td><td>PASS</td></tr>
+</tbody>
+</table>
+
+<p>Per-family results:</p>
+
+<div class="test-card" style="border-left:3px solid var(--gold);background:rgba(201,149,108,0.03);padding:14px 18px;margin:10px 0;">
+<strong style="color:var(--gold);">ML-DSA-65 (FIPS 204):</strong> Keygen produces 1,952-byte public keys matching the NIST specification. Detached signatures are exactly 3,309 bytes. Sign/verify round-trip passes. Tampered signatures (single bit flip) are rejected. Signatures under a different keypair are rejected. Signatures verified against a different message are rejected. Six tests, all pass.
+</div>
+
+<div class="test-card" style="border-left:3px solid var(--gold);background:rgba(201,149,108,0.03);padding:14px 18px;margin:10px 0;">
+<strong style="color:var(--gold);">FALCON-512 (Draft FIPS 206 / FN-DSA):</strong> Keygen produces 897-byte public keys matching the NIST specification. Detached signatures are variable-length, bounded by 666 bytes. Across 100 signatures on distinct messages, observed signature sizes ranged from 649 to 661 bytes &mdash; all within the NIST-specified bound. Sign/verify round-trip passes. Tampered signatures are rejected. Wrong-key signatures are rejected. Six tests, all pass.
+</div>
+
+<div class="test-card" style="border-left:3px solid var(--gold);background:rgba(201,149,108,0.03);padding:14px 18px;margin:10px 0;">
+<strong style="color:var(--gold);">SLH-DSA-SHA2-128f (FIPS 205):</strong> Keygen produces 32-byte public keys matching the NIST specification. Detached signatures are exactly 17,088 bytes. Sign/verify round-trip passes. Tampered signatures (bit flip at byte offset 100) are rejected. Wrong-key signatures are rejected. Five tests, all pass.
+</div>
+
+<div class="test-card" style="border-left:3px solid var(--gold);background:rgba(201,149,108,0.03);padding:14px 18px;margin:10px 0;">
+<strong style="color:var(--gold);">Three-family independence:</strong> The same 32-byte signing message was signed by all three families independently. Each signature verifies only under its own public key. Total ephemeral bundle: 21,051 bytes (3,309 + 654 + 17,088). Distillation to 74 bytes: 284.5:1. The three families are cryptographically independent &mdash; no signature from one family is accepted by any other family's verifier.
+</div>
+
+<p>The test source is published in the reference implementation crate at <code>tests/nist_kat.rs</code>. All public key sizes, signature sizes, and verification behaviors match the NIST-published specifications for each algorithm family.</p>
+
+<!-- ============================== -->
+<!-- SECTION 8: Commercial Deploy   -->
+<!-- ============================== -->
+<h2 class="section-title" id="s8">8. Commercial Deployment and Licensing Model <span style="font-size:0.7em;font-weight:400;color:var(--gray);text-transform:uppercase;letter-spacing:0.05em;">(Non-Normative)</span></h2>
+
+<p><em>This section describes the reference commercial implementation and is non-normative. The cryptographic construction of Sections 3&ndash;6 is independent of the deployment model described here.</em></p>
+
+<p>H33-74, as a primitive, is deployment-agnostic. This section describes the deployment model adopted by the H33.ai reference commercial implementation, not because it is the only possible deployment model, but because it is the model that admits the best composition of H33-74's security properties with the commercial licensing and billing structure required to sustain the reference implementation over time. The model is intentionally structured so that the licensing enforcement does not contradict H33-74's trustlessness properties, and so that customers who adopt the commercial reference implementation are not operationally dependent on infrastructure operated by the commercial vendor.</p>
+
+<h3 class="subsection-title" id="s8-1">8.1. Customer-Hosted Execution</h3>
+
+<p>In the commercial deployment, the signing binary runs entirely on customer-owned infrastructure. No primitive operation &mdash; minting, signing, verification, or storage &mdash; requires a network call to infrastructure operated by the commercial reference implementer (H33.ai, Inc.). An exception exists at initial deployment: the TEE binary performs a one-time key provisioning handshake with the vendor's attestation service to unlock the signing keypair. After this one-time provisioning event, no further vendor contact is required for any primitive operation. The customer installs the licensed binary on their own hardware, typically inside a Trusted Execution Environment (AWS Nitro Enclave, Intel SGX, AMD SEV-SNP, or equivalent), and operates it under their own security posture. License revocation is enforced via a revocation primitive published from a well-known vendor address; binaries check periodically and fail closed if their fingerprint appears in the revocation tree.</p>
+
+<p>This architectural choice is motivated by three requirements that recur across commercial and regulated deployments. First, many customers subject to data-residency regulations (GLBA, HIPAA, GDPR, ITAR, FedRAMP, PCI-DSS) cannot legally send sensitive data to a third-party service, regardless of the security guarantees the third party might offer. A self-hosted deployment removes this objection entirely: the customer's data never leaves the customer's perimeter. Second, customers with performance-sensitive workloads prefer to minimize network round-trips by running the signer adjacent to the computation being attested, which is possible only with self-hosted execution. Third, the self-hosted model removes the commercial vendor as an operational dependency &mdash; customers whose primitives are minted on their own hardware continue to function even if the vendor experiences an outage, is acquired, is sued, or ceases operations entirely.</p>
+
+<p>We note that this deployment model is how most commercial cryptographic infrastructure actually ships in the enterprise market. Hardware Security Modules (Thales Luna, AWS CloudHSM physical appliances, Fortanix DSM, Utimaco), specialized cryptographic appliances, compliance-grade key management systems, and most enterprise cryptographic signing products ship as on-premise or customer-cloud-hosted artifacts with vendor licensing and support, not as hosted SaaS APIs. The primitive's commercial deployment follows the same pattern.</p>
+
+<h3 class="subsection-title" id="s8-2">8.2. Trusted Execution Environment Protection</h3>
+
+<p>The licensed binary is distributed as an encrypted image that can only be decrypted inside a supported TEE. At first launch, the TEE attests its measurement chain to the commercial vendor's release signer, receives a per-customer decryption key provisioned via the TEE's remote attestation protocol (using ML-KEM-768 [@fips203] for the key encapsulation), and unlocks the binary for execution. The three-family signing keypair for the customer's deployment is generated inside the TEE at first launch and never leaves it; the customer's own operators cannot extract it through any software interface, and the commercial vendor cannot extract it without the TEE's cooperation.</p>
+
+<p>The TEE protection serves two distinct purposes. The first is standard key custody: the signing keys are protected from extraction by root-level access to the host machine, defending against insider threats, supply-chain attacks on the operating system, and compromise of the customer's own system administrators. The second is license enforcement: the binary verifies, at startup and periodically during operation, that the current license is valid and has not been revoked, and refuses to run if either condition fails.</p>
+
+<p>We note explicitly that TEE protection is not cryptographically unconditional. Intel SGX has been compromised multiple times by side-channel attacks (Foreshadow, Plundervolt, SGAxe, and several other published breaks), and AMD SEV-SNP has had its own history of partial breaks. The primitive's overall security posture does not rely on the TEE as a trust root &mdash; the three-family signature bundle described in &sect;4 remains valid even if the TEE is compromised, because the signing operation itself is performed by standard post-quantum algorithms whose security does not depend on the TEE. The TEE protects the signing keys from extraction and the license state from tampering; it does not provide the cryptographic guarantees of the attestation itself. Primitive verification by a third party is independent of TEE status &mdash; a verified primitive remains verified whether or not the original signer's TEE was subsequently compromised.</p>
+
+<h3 class="subsection-title" id="s8-3">8.3. License Fingerprint Embedding</h3>
+
+<p>At commercial agreement signing time, the commercial vendor generates a per-customer license fingerprint derived from the customer identifier, the license epoch (the date the agreement became active), and the SHA-256 hash of the executed commercial agreement document. The fingerprint is an 8-byte value computed as HMAC-SHA256(k<sub>vendor</sub>, customer_id || epoch || agreement_hash), truncated to 8 bytes, where k<sub>vendor</sub> is a symmetric key held only by the vendor's licensing infrastructure. The 8-byte (64-bit) truncation is sufficient for customer attribution within realistic deployment populations. At 2<sup>16</sup> (~65,000) simultaneous active customers &mdash; well beyond any near-term deployment scenario &mdash; the birthday-bound collision probability is approximately 2<sup>-33</sup>, which is negligible. At larger populations, fingerprint collisions would affect only billing attribution (not cryptographic security), and the vendor can resolve ambiguities using the customer_id and epoch inputs available in the licensing database.</p>
+
+<p>The fingerprint is embedded into the encrypted binary at shipment time. Every primitive minted by the customer's deployment encodes the fingerprint into the first 8 bytes of H33-74's 16-byte nonce field; the remaining 8 bytes are filled with fresh random bytes from the cryptographically secure random source. To external observers examining a single primitive, the fingerprinted nonce is computationally indistinguishable from a uniformly random nonce (under the standard PRF assumption on HMAC-SHA256, the truncated output is indistinguishable from uniform random bytes); repeated primitives from the same deployment share the same 8-byte prefix, which is observable by an adversary comparing multiple primitives but does not reveal the customer's identity without the vendor's HMAC key. The fingerprint reveals nothing about the customer's identity or the commercial terms of the license to any party not holding k<sub>vendor</sub>. We note, however, that an observer with access to the public primitive store who compares multiple primitives can cluster them by deployment &mdash; grouping all primitives that share the same 8-byte nonce prefix &mdash; without being able to identify which customer produced the cluster. This is a clustering-without-identification property: the observer learns that a set of primitives came from the same deployment, but not whose deployment it is. Customers with linkability concerns can mitigate this by rotating deployments or requesting periodic fingerprint refresh from the vendor. To the vendor holding k<sub>vendor</sub>, the fingerprint is deterministically computable from the customer's identifying data, and primitives bearing the fingerprint are attributable to the corresponding customer.</p>
+
+<table>
+<thead><tr><th>Field</th><th>Data</th><th>Location</th><th>On-Chain Exposure</th><th>Third-Party Exposure</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>customer_id</td><td>Customer identifier string</td><td>Vendor licensing DB only</td><td>None</td><td>None</td><td>Never embedded in primitive directly</td></tr>
+<tr><td>license_epoch</td><td>Date agreement became active</td><td>Vendor licensing DB only</td><td>None</td><td>None</td><td>Input to HMAC, not stored in primitive</td></tr>
+<tr><td>agreement_hash</td><td>SHA2-256 of executed agreement document</td><td>Vendor licensing DB only</td><td>None</td><td>None</td><td>Input to HMAC, not stored in primitive</td></tr>
+<tr><td>k<sub>vendor</sub></td><td>Vendor HMAC symmetric key</td><td>Vendor licensing infrastructure only</td><td>None</td><td>None</td><td>Never leaves vendor; used to compute and verify fingerprints</td></tr>
+<tr><td>fingerprint</td><td>HMAC-SHA256(k<sub>vendor</sub>, customer_id &Vert; epoch &Vert; agreement_hash), truncated to 8 bytes</td><td>TEE only at customer site; vendor DB</td><td>None directly &mdash; embedded in nonce field</td><td>Not recoverable without k<sub>vendor</sub></td><td>Indistinguishable from random in single-primitive observation</td></tr>
+<tr><td>nonce field (16 bytes)</td><td>Bytes 0&ndash;7: fingerprint. Bytes 8&ndash;15: fresh CSPRNG random</td><td>Inside primitive S (customer TEE + primitive store)</td><td>Not directly &mdash; only SHA3-256(S) is on-chain</td><td>Observable in primitive store but not decomposable without k<sub>vendor</sub></td><td>External observer sees only the hash of the full primitive, not the nonce itself</td></tr>
+<tr><td>signing message m(S)</td><td>SHA3-256(full 58-byte primitive)</td><td>On-chain permanently</td><td>32 bytes &mdash; fully public</td><td>Fully public</td><td>This is what goes into OP_RETURN or Taproot tweak</td></tr>
+<tr><td>primitive S</td><td>Full 58-byte tuple</td><td>Customer TEE + public primitive store</td><td>Not directly &mdash; only m(S) is on-chain</td><td>Public via primitive store</td><td>Retrievable by anyone with m(S) as lookup key</td></tr>
+<tr><td>compact receipt R</td><td>42-byte receipt</td><td>Off-chain receipt store</td><td>None</td><td>Public via receipt store</td><td>Indexed by R.c &mdash; the verification digest</td></tr>
+<tr><td>signature bundle &sigma;</td><td>~21,063 bytes (ML-DSA + FALCON + SLH-DSA)</td><td>Off-chain ephemeral signature store</td><td>None</td><td>Public via signature store indexed by R.c</td><td>May be destroyed after verification at signer's discretion</td></tr>
+<tr><td>billing count</td><td>Count of matched primitives per customer per period</td><td>Vendor chain scanner + credit ledger</td><td>Derivable by vendor from on-chain data</td><td>Not directly accessible</td><td>Both parties derive independently from same public ledger</td></tr>
+<tr><td>credit balance</td><td>Prepaid mints remaining</td><td>Customer TEE + vendor credit ledger</td><td>None</td><td>None</td><td>Decremented at mint time by licensed binary</td></tr>
+</tbody>
+</table>
+
+<h3 class="subsection-title" id="s8-4">8.4. Bitcoin Chain Metering</h3>
+
+<p>Every primitive produced by a customer's deployment is anchored to the Bitcoin blockchain &mdash; via Taproot key-path tweak or OP_RETURN &mdash; for reasons intrinsic to the primitive protocol (discussed in &sect;9.1 on Bitcoin UTXO Attestation) rather than for billing reasons. The anchoring serves the customer's own integrity workflow: it establishes an immutable public timestamp for the attestation that can be independently verified by any third party with Bitcoin network access.</p>
+
+<p>The commercial vendor operates a Bitcoin chain scanner that reads Taproot commitment tweaks (or OP_RETURN outputs) from Bitcoin full nodes, resolves each observed signing message m(S) against the public primitive store to retrieve the full 58-byte primitive S, extracts the fingerprint from the nonce field of S, and tests it against the license fingerprints of the active customer population. Every match is a primitive attributed to the corresponding customer. The chain scanner serves as the canonical usage meter &mdash; the authoritative record of how many primitives a customer has minted. Commercially, customers acquire credits in advance, and the licensed binary decrements credits at mint time. The chain scanner reconciles the credit ledger against the on-chain record at the end of each billing period, ensuring that the credit-based prepayment and the chain-observed usage agree.</p>
+
+<p>This billing mechanism has two structurally important properties that distinguish it from conventional commercial API metering.</p>
+
+<p>First, the billing ledger is the Bitcoin blockchain itself. The commercial vendor and the customer compute the billing count from the same public data, using the same deterministic fingerprint matching function, and must always agree on the result. Billing disputes are structurally minimized: if the two counts disagree, the discrepancy can be traced to the customer's internal accounting or the vendor's fingerprint matching, because both sides derive their counts from the same authoritative source. The Bitcoin blockchain's immutability guarantees that historical billing counts cannot be retroactively altered by either party.</p>
+
+<p>Second, the customer cannot under-report usage without simultaneously failing to anchor their own primitives, which defeats the customer's own integrity workflow. The anchoring to Bitcoin is the customer's independent reason for using H33-74 in the first place; the same anchoring action that provides the customer with their integrity guarantees also constitutes the billing record. The customer's self-interest is therefore aligned with the billing integrity &mdash; they cannot cheat the vendor without simultaneously cheating themselves of the protection they are paying for.</p>
+
+<p>We consider these two properties to be the primary structural reason that the self-hosted commercial model is viable at scale, though we acknowledge that operational edge cases (customer key rotation, TEE migration, network partitions during anchor broadcast) require additional engineering beyond what the structural argument alone provides.</p>
+
+<p>In the event the commercial vendor ceases operations, customers retain primitive verification capability through the open-source h33-74-verifier crate (Apache 2.0), provided that the public keys of the original signer remain available and the verifier crate remains accessible. The on-chain anchors (whether Taproot tweaks or OP_RETURN outputs) remain on the Bitcoin chain permanently. The three-family signing keys were generated inside the customer's own TEE and never left it; the customer's deployed binary continues to function. Billing simply stops. No primitive signed by a surviving deployment becomes unverifiable solely due to the vendor's absence, provided the signer's public keys and the open-source verifier remain available.</p>
+
+<h3 class="subsection-title" id="s8-5">8.5. Module Breakout</h3>
+
+<p>The commercial deployment ships as a set of separately-licensed modules, each with its own enforcement surface. Four modules comprise the minimal deployment footprint:</p>
+
+<div class="card-grid">
+  <div class="card">
+    <h4>h33-74-core</h4>
+    <p>The canonical commitment construction itself, including the wire-format assembly, signing message derivation, nonce generation, computation type registry enforcement, Merkle aggregation for batched mode, and CompactReceipt assembly. Subject to the per-mint economic model described in Appendix B. Commercial license required.</p>
+  </div>
+  <div class="card">
+    <h4>h33-3key-signer</h4>
+    <p>The three-family post-quantum signer described in &sect;4, including the parallel signing implementation, the CompactReceipt distillation, the ephemeral signature store indexing, and the key rotation policy engine. Typically deployed together with h33-74-core as a bundled pair. Commercial license required.</p>
+  </div>
+  <div class="card">
+    <h4>h33-cachee-core</h4>
+    <p>The in-process two-tier cache described in &sect;7, including the CacheeLFU admission sketch and observability instrumentation. Subject to a separate per-operation royalty structure documented in the commercial license agreement. Commercial license required.</p>
+  </div>
+  <div class="card">
+    <h4>h33-74-verifier</h4>
+    <p>A minimal primitive verifier crate released under the Apache License 2.0. Any party may verify any primitive locally, using only public keys and local cryptography, without acquiring a commercial license. The verifier is open source because verification is a pure function of public data, and because the trustlessness of verification is a defining property of H33-74.</p>
+  </div>
+</div>
+
+<p>The verifier's open-source release establishes that verification of any primitive, past or future, is independent of the commercial vendor's continued existence. A customer holding primitives that were minted under a commercial license retains the ability to verify those primitives indefinitely, even in the absence of the commercial vendor, using only the open-source verifier and the publicly-distributed public key set of the original signer.</p>
+
+<!-- ============================== -->
+<!-- SECTION 9: Applications        -->
+<!-- ============================== -->
+<h2 class="section-title" id="s9">9. Applications</h2>
+
+<p>H33-74 is a general-purpose primitive and admits applications in any domain that requires a post-quantum, fixed-width, batch-friendly attestation of a computation result. We describe nine applications we have implemented, and enumerate what the computation type byte is set to in each.</p>
+
+<p>The application we spend the most space on is post-quantum Bitcoin UTXO attestation, because this paper is addressed in part to the Bitcoin developer community and because the contrast with script-layer constructions like QSB is most instructive in the Bitcoin context.</p>
+
+<h3 class="subsection-title" id="s9-1">9.1. Bitcoin UTXO Attestation (t = 0x06)</h3>
+
+<p><strong>Motivation.</strong> A UTXO is produced by an off-chain computation &mdash; say, a privacy-preserving fraud score, a regulated financial settlement, or a proof-of-reserves computation &mdash; and the holder wishes to prove, at any point in the future, that the UTXO was produced by a specific computation whose result r is known and whose canonical encoding hashes to a specific digest H(r). A Bitcoin on-chain commitment (Taproot tweak or OP_RETURN) can timestamp the UTXO but does not by itself prove computation provenance. The primitive provides the provenance certificate by binding the result digest to a three-family post-quantum signature at a specific timestamp.</p>
+
+<p><strong>Construction.</strong> The computation producer runs Mint(0x06, r) &rarr; S where r is the canonical encoding of the computation's result, then Sign(S, ...) &rarr; (R, &sigma;), and commits the 32-byte signing message m(S) = SHA3-256(S) to a Bitcoin transaction &mdash; either as a Taproot key-path tweak on the output (Q = P + H(P || m(S)) &middot; G, adding zero marginal transaction weight) or as a standard OP_RETURN output. The transaction is broadcast through the standard Bitcoin mempool and does not require a private mempool service. The holder retains (r, S, R, &sigma;) off-chain.</p>
+
+<p><strong>Verification.</strong> A third party who wishes to verify the provenance of the UTXO obtains (r, S, R) from the holder (or from the signer's public primitive store), obtains the raw signature bundle &sigma; from the signer's ephemeral signature store indexed by R.c, and runs Verify. In addition to the primitive verification, the third party fetches the Bitcoin transaction and verifies the on-chain commitment &mdash; either by recomputing the Taproot output key from the internal key and the signing message, or by checking that SHA3-256(S) matches the OP_RETURN payload and that the transaction is confirmed in the block height claimed by the holder. A successful verification proves, under the three-family security argument of Section 6 composed with the security of the Bitcoin ledger, that the UTXO was anchored to the Bitcoin chain at the claimed block height as the output of a computation of type 0x06 with computation result r, whose canonical encoding hashes to the attested content digest h = H(r).</p>
+
+<p><strong>Relationship to Script-Layer Post-Quantum Constructions.</strong> The Bitcoin script locking the UTXO is orthogonal to the primitive attestation and can be any script the holder chooses. If the holder wishes to additionally protect the UTXO against script-layer signature forgery by a quantum adversary, they may use a QSB or BINOHASH locking script. The two constructions compose freely and neither interferes with the other. We discuss this composition in Section 10.</p>
+
+<p><strong>Cost.</strong> The primitive attestation contributes a 32-byte commitment to the Bitcoin transaction &mdash; zero marginal bytes via Taproot key-path tweak, or 34 bytes via OP_RETURN. At the global aggregate rate (Appendix B), the attestation fee paid to the commercial reference implementation is $0.025 per mint at launch (decreasing as global adoption grows) &mdash; illustratively several orders of magnitude lower at launch than the published QSB per-transaction cost estimates (noting that QSB economics may evolve as the construction matures). The Bitcoin transaction itself is standard and costs whatever the current Bitcoin mempool fee market sets for a standard OP_RETURN spend.</p>
+
+<p>We note that this application requires no coordination with Bitcoin miners, developers, or node operators. H33-74 is already deployable on Taproot-enabled Bitcoin today, using only existing transaction formats and existing relay policy. Any Bitcoin holder with access to the reference signing binary can begin producing post-quantum-attested UTXO commitments immediately.</p>
+
+<h3 class="subsection-title" id="s9-2">9.2. HTTP API Response Attestation (t = 0x0C)</h3>
+
+<p>An HTTP server produces a response body and runs Mint(0x0C, response body) &rarr; S, then Sign(S, ...) &rarr; (R, &sigma;). The server installs four HTTP response headers: X-H33-Primitive containing the 32-byte signing message, X-H33-Receipt containing the 42-byte compact receipt, X-H33-Algorithms containing the FIPS canonical algorithm identifiers of the three families, and X-H33-Primitive-Ts containing the millisecond timestamp. A client verifies the response body locally against the primitive and performs the three signature checks against the server's published public keys. The verification performs no network calls beyond the initial HTTP GET.</p>
+
+<h3 class="subsection-title" id="s9-3">9.3. AI Inference Provenance (t = 0x0D)</h3>
+
+<p>A machine-learning inference engine produces an output &mdash; a classification, a prediction, a generated text &mdash; together with the model identifier, the model weight hash, the input hash, the output hash, and the inference timestamp. The inference engine runs Mint(0x0D, concatenation of those fields) &rarr; S and signs it. The resulting attestation proves that the named output was produced by the named model on the named input at the named time. An output lacking an AI-inference-domain primitive attestation is, by the converse, provably not an attested inference from any system implementing this application.</p>
+
+<h3 class="subsection-title" id="s9-4">9.4. Capture-Time Media Authenticity (t = 0x0E)</h3>
+
+<p>A digital media capture device (camera, microphone, CCTV) is provisioned at manufacture time with a three-family post-quantum signing key set. At capture time, the device's firmware computes the SHA3-256 of the raw sensor data before any post-processing, runs Mint(0x0E, sensor data), signs the primitive, and embeds the 32-byte signing message and 42-byte compact receipt into the media file's metadata or a sidecar file. Any downstream verifier can check that the media was produced by the named device class at the named time and has not been modified since capture. Media artifacts lacking a capture-time media primitive are provably not capture-time originals from any device implementing this application. We note in passing that this is an answer to the content-authenticity problem that has recently gained public attention under the name "deepfake detection."</p>
+
+<h3 class="subsection-title" id="s9-5">9.5. Legal Evidence Chain of Custody (t = 0x0F)</h3>
+
+<p>A digital artifact enters legal evidence. Each access, transfer, or transformation of the artifact is recorded as a primitive of type 0x0F, whose h field binds to the event details and whose prior-primitive reference (via a primitive-referencing-primitive construction) binds the event to the preceding event in the custody chain. The complete custody chain from creation to courtroom presentation is cryptographically provable from the directed acyclic graph of primitive commitments alone, without reliance on the integrity of any centralized custody database.</p>
+
+<p>We note an important limitation. H33-74 attests the computation result, not input authenticity. A primitive anchored to a forged document is a cryptographically valid attestation of a forged document. The primitive's value in legal contexts is establishing chain of custody and detecting post-attestation modification &mdash; it does not substitute for the identity verification and source authentication that establish the authenticity of the underlying document before attestation.</p>
+
+<p>To mitigate this limitation, a document attestation primitive may incorporate both a cryptographic commitment to the document content and a cryptographic commitment to a verified identity credential of the submitting party &mdash; for example, a ZK-KYC proof or a government-issued identity attestation &mdash; via the primitive-referencing-primitive construction described above. In this configuration, a forged deed has a verified identity cryptographically linked to its submission event. The forger is now bound to the forgery by the same three-family post-quantum signature that protects the attestation itself. Combined with Bitcoin anchoring, this produces a millisecond-precision, quantum-resistant, immutable record of who submitted the document for attestation and when &mdash; providing cryptographic provenance evidence that composes with traditional notarization procedures to strengthen chain-of-custody arguments.</p>
+
+<h3 class="subsection-title" id="s9-6">9.6. Federated Machine-Learning Mesh</h3>
+
+<p>A federation of machine-learning agents exchanges primitive content-address tags instead of the underlying data payloads. Each payload &mdash; model weights, context windows, retrieval chunks, gradient updates, tool invocation results &mdash; is bound to a primitive at the moment of production, and H33-74's 32-byte signing message functions as the network-level identifier for the payload. Receiving agents resolve tags against a local content-addressed store and fetch payloads only on demand. The aggregate per-agent bandwidth cost is decoupled from the aggregate data volume of the distributed learning workload. This application treats the primitive as a content-address tag rather than as a per-computation attestation, and we find the generalization useful in practice.</p>
+
+<h3 class="subsection-title" id="s9-7">9.7. Authenticated Relay Messaging (t = 0x10)</h3>
+
+<p>Two systems that need to exchange authenticated messages &mdash; whether across organizational boundaries, between microservices in a distributed deployment, or between autonomous agents in a multi-agent pipeline &mdash; can use primitives as self-authenticating message envelopes. The sender mints a primitive of type 0x10 whose h field binds to the message payload, signs it under its three-family key set, and transmits the 74-byte anchored footprint (the 32-byte signing message plus the 42-byte compact receipt) alongside or in place of the payload itself. The receiver verifies the primitive locally, using only the sender's public key set and the signature bundle, and accepts the message only if verification succeeds.</p>
+
+<p>The construction eliminates the need for a centralized message broker to vouch for message authenticity. No trusted intermediary holds a signing key or a shared secret; H33-74's three-family signature is the authentication credential, and it travels with the message. In a publish-subscribe topology, the publisher attests each message at production time and subscribers verify independently, without trusting the relay infrastructure. A compromised relay can delay or drop messages but cannot forge them, because forgery requires producing valid signatures under all three post-quantum families simultaneously.</p>
+
+<p>We note that H33-74 in this application functions as a network-layer primitive rather than a storage-layer primitive. The 74-byte footprint is small enough to fit in a single UDP datagram header extension, an MQTT payload prefix, or a gRPC metadata field. The receiver does not need to contact Bitcoin or any ledger to verify the message; verification is purely local and purely offline. When the application additionally requires non-repudiation or global ordering, the signing message can optionally be anchored to Bitcoin in the same manner described in Section 9.1, but the anchoring step is not required for the authenticated-relay use case.</p>
+
+<p>The authenticated relay additionally functions as a network-layer routing primitive whose computation type byte and signing message can be parsed by intermediate network nodes to guide application-layer routing and reference storage decisions &mdash; directing the application layer to the appropriate off-chain content store without transmitting the underlying payload. This construction is distinct from unauthenticated blockchain-based coordination channels, which have been exploited as command-and-control infrastructure for botnet operations. Because every relay primitive requires a valid three-family post-quantum signature under a registered computation type, unauthenticated coordination instructions are rejected cryptographically at the network layer. Cross-domain injection &mdash; using a relay primitive to deliver instructions intended for a different computation domain &mdash; is prevented by the domain separation registry, which makes cross-type replay cryptographically impossible.</p>
+
+<p><strong>Abuse surface: authenticated command-and-control.</strong> We acknowledge a limitation that the preceding paragraph does not fully address. H33-74 prevents <em>unauthenticated</em> abuse of the relay channel, but it does not prevent <em>authenticated</em> abuse. A holder of a valid three-family signing key can attest arbitrary byte sequences, including sequences that encode executable instructions, configuration payloads, or coordination signals for malicious software. The three-family signature makes such payloads <em>attributable</em> and <em>non-repudiable</em> &mdash; the signer is cryptographically bound to every instruction they issue &mdash; but it does not prevent the issuance itself. More broadly, the primitive-referencing-primitive construction that we describe as a feature in &sect;9.5 and &sect;9.8 is, from a command-and-control perspective, a chaining mechanism whose ergonomics could be exploited by a sophisticated adversary with access to a signing key. We consider the design of friction mechanisms that make reflexive primitive chaining operationally costly without degrading legitimate relay throughput to be an open design question, and we flag it here so that reviewers evaluating H33-74 for deployment in adversarial environments can weigh this surface explicitly.</p>
+
+<h3 class="subsection-title" id="s9-8">9.8. Identity Credential Attestation (t = 0x11)</h3>
+
+<p>A verified identity &mdash; the output of a KYC check, a biometric enrollment, an organizational role assignment, a device registration, or any other identity-establishing event &mdash; can be bound to a primitive of type 0x11 whose h field commits to the canonical encoding of the identity claim. The resulting primitive is a signed, verifiable, post-quantum-secure credential: a 74-byte object that proves that a specific identity claim was attested at a specific time by the holder of a specific three-family key set, under three independent hardness assumptions.</p>
+
+<p>The credential is self-contained. A verifier who possesses the primitive, the compact receipt, and the signer's public key set can confirm the credential's integrity without contacting the issuer, without accessing a centralized identity directory, and without any network connectivity. This property is particularly valuable in environments where connectivity is intermittent (field operations, disaster response, air-gapped facilities) or where the verifier does not trust the network path to the issuer.</p>
+
+<p>The primitive-referencing-primitive construction introduced in Section 9.5 enables credential composition: a document attestation primitive (type 0x0F) can reference an identity credential primitive (type 0x11) by including the identity primitive's signing message in its computation result. The composed construction binds who presented a document to what was presented and when, under the same three-family post-quantum security as the individual attestations. We have implemented this composition in our legal evidence application and in our KYC verification flow, and we find it to be a natural and useful pattern.</p>
+
+<p>We emphasize a limitation. H33-74 attests that an identity claim was made and signed; it does not independently verify the truth of the underlying claim. A fraudulent identity provider who controls a signing key can issue primitives for fabricated identities. The primitive's value is in binding the claim to a specific signer, a specific time, and a specific three-family key set &mdash; creating a cryptographic audit trail that holds the issuer accountable for every credential it produces. The accountability is post-quantum-durable: even after a quantum computer breaks classical signature schemes, the three-family primitive binding remains intact.</p>
+
+<h3 class="subsection-title" id="s9-9">9.9. Post-Quantum Proof of Life (t = 0x12)</h3>
+
+<p><strong>Motivation.</strong> Approximately 1.8 million BTC reside in Pay-to-Public-Key (P2PK) outputs whose secp256k1 public keys are exposed on the blockchain. A sufficiently powerful quantum adversary running Shor's algorithm could derive the corresponding private keys and spend those outputs. The holder of such an output may wish to prove, cryptographically, that they still control the private key &mdash; and to bind that proof of control to a post-quantum key set &mdash; without revealing the private key itself and without moving the coins.</p>
+
+<p><strong>Construction.</strong> The holder generates a ZK-STARK proof of discrete logarithm knowledge: "I know a scalar sk such that pk = sk &middot; G on secp256k1," where G is the standard generator and pk is the exposed public key. The STARK proof is generated over a Goldilocks field (p = 2<sup>64</sup> &minus; 2<sup>32</sup> + 1) using non-native field arithmetic, representing each 256-bit secp256k1 base field element as eight 32-bit limbs. The 32-bit limb width ensures that every limb product fits exactly within the Goldilocks field without wraparound, yielding unconditional arithmetic soundness &mdash; the algebraic constraints faithfully represent the intended secp256k1 arithmetic without requiring auxiliary range proofs on intermediate carry values.</p>
+
+<p>The execution trace consists of 256 rows (one per bit of the scalar), each implementing a projective-coordinate point doubling and conditional point addition. The Algebraic Intermediate Representation (AIR) enforces 836 constraints per transition row: 448 for projective point doubling (11 non-native field multiplications), 336 for projective point addition (8 non-native field multiplications), 48 for infinity-aware and scalar-bit multiplexing, and 4 for control flow (binary enforcement and step counter). The total constraint surface is approximately 213,000 Goldilocks field equations across 255 transitions, plus boundary constraints at the first and last rows that bind the accumulator's initial state to the group identity and its final state to the claimed public key.</p>
+
+<p>The SHA3-256 hash of the STARK proof's polynomial commitments &mdash; specifically, the Merkle roots of the trace commitment and the constraint commitment produced during the FRI protocol &mdash; serves as the proof commitment. This commitment is bound to an H33-74 primitive of type 0x12 (PostQuantumMigration) via a domain-tagged binding digest: SHA3-256(<code>h33:proof-of-life:v1:</code> || proof_commitment || pk_compressed || pq_pk_hash || nonce). The binding digest becomes the content field of the H33-74 primitive, which is then signed under all three post-quantum families.</p>
+
+<p><strong>What it proves.</strong> A verified proof-of-life primitive establishes: (1) the holder knows the private key corresponding to a specific secp256k1 public key, without revealing the private key; (2) that knowledge is cryptographically bound to a specific three-family post-quantum key set; and (3) the binding is attested via H33-74 with a timestamp and, optionally, a Bitcoin anchor. This is the first application in this paper that addresses the limitation identified in &sect;1.2 &mdash; that H33-74 attests results but does not verify computation correctness. The STARK proof verifies the computation (discrete logarithm) and the primitive attests the verification.</p>
+
+<p><strong>Relationship to Script-Layer Constructions.</strong> Proof of life is complementary to, and independent of, script-layer post-quantum spending constructions such as QSB. QSB protects a UTXO against quantum-assisted forgery of a spending transaction. Proof of life proves that the holder of a classical key still controls it and has migrated that control to a post-quantum key set. The two constructions serve different purposes and compose freely: a holder might prove life (establishing post-quantum key binding) and subsequently spend via a QSB-locked output (protecting the spend itself). Neither construction requires the other.</p>
+
+<p><strong>Limitations.</strong> The STARK proof establishes knowledge of the private key. It does not establish that the prover is the "rightful" owner of the corresponding Bitcoin &mdash; classical Bitcoin has the same limitation, and proof of life inherits it. The proof is also not transferable: the binding to the prover's PQ key set means that a third party cannot replay the proof to claim control under a different PQ identity.</p>
+
+<p><strong>Performance.</strong> Cold proof generation completes in 495 ms on Apple Silicon (release build) and 813 ms on AWS Graviton4 (c8g.16xlarge, release build). The proof consists of two 32-byte Merkle roots (trace commitment and constraint commitment) plus FRI query responses; the proof commitment bound to the H33-74 primitive is a single 32-byte SHA3-256 hash. Verification of the H33-74 attestation (binding consistency plus three-family signature check) completes in 71 &mu;s. With Cachee-backed proof caching, repeat attestations for the same (pk, pq_key_set) binding skip the STARK pipeline entirely and complete in 1.75 ms (282&times; speedup), dominated by the three-family PQ signing cost. Cached verification completes in sub-microsecond time. The STARK engine is a custom Goldilocks-field implementation with SHA3-256 Merkle commitments and a FRI-based polynomial commitment scheme; it does not use Winterfell, Plonky2, or any third-party proving framework.</p>
+
+<p><strong>Circuit Audit.</strong> The AIR constraints were validated against <code>k256</code> (RustCrypto's secp256k1 implementation) as a trusted oracle. Differential testing computed pk = sk &middot; G independently in both the native implementation and k256 for 1,100 keys: 4 named test vectors (sk = 1, 2, 42, 0xDEADBEEF), 32 powers of 2, 5 edge cases (sk = n&minus;1, byte-boundary values 255/256/257, the generator point, and sk &gt; n), 100 pseudo-random keys, and 1,000 pseudo-random keys. All 1,100 key pairs produced identical (x, y) coordinates in both implementations. The AIR transition constraints (836 per row &times; 255 transitions) were verified to evaluate to zero for all 1,100 keys, plus 50 additional random keys tested at the constraint level. Boundary constraints at rows 0 and 255 were verified independently. Tamper detection was confirmed: modifying a single field element in the accumulator, flipping a single scalar bit, or corrupting the step counter each produced constraint violations detected by the verifier.</p>
+
+<p><strong>Bug Disclosure.</strong> Differential testing against k256 revealed a modular multiplication error in the native secp256k1 field arithmetic. The original implementation used a bit-by-bit shift-and-subtract reduction of the 512-bit product, processing 64 individual doublings per limb (512 total conditional subtractions per multiplication). This algorithm produced correct results for sk = 1 (which requires no point doubling beyond the generator lookup) but diverged from k256 for sk &ge; 2. The root cause was accumulated rounding in the iterative reduction path. The fix replaced the hand-rolled reduction with <code>num-bigint</code> (a widely audited arbitrary-precision integer library already present in the dependency tree). After the fix, all 1,100 differential test keys matched k256 exactly, and all AIR constraint checks passed with zero violations. We disclose this bug because it illustrates a class of error that is invisible to internal consistency testing &mdash; the AIR constraints were satisfied before and after the fix, because the constraints faithfully encoded the (incorrect) native arithmetic. Only differential testing against an independent trusted oracle detected the divergence. We consider this finding a strong argument for mandatory oracle-based differential testing of any ZK circuit that encodes non-native field arithmetic.</p>
+
+<p><strong>Implementation Status.</strong> The construction described above is built, tested, and deployed. A reference verifier for H33-74 attestations, including proof-of-life verification, is open-sourced at <a href="https://github.com/H33ai-postquantum/H33-74-Verifier" style="color:var(--gold)">github.com/H33ai-postquantum/H33-74-Verifier</a>. The proving engine and circuit constraints are proprietary to H33.ai, Inc.</p>
+
+<h3 class="subsection-title" id="s9-10">9.10. What These Applications Have In Common</h3>
+
+<p>We list the nine applications above because they are what we have implemented. The common thread is that each application requires the same four properties, and H33-74 satisfies all four simultaneously:</p>
+
+<ol>
+  <li><strong>Fixed interface.</strong> The primitive accepts an arbitrary computation type and an arbitrary computation result. It is application-agnostic: the same Mint/Sign/Verify interface attests a biometric match, a legal document, a financial settlement, an AI inference, or a proof of Bitcoin key control. No per-application customization is required.</li>
+  <li><strong>Fixed size.</strong> The persistent footprint is 74 bytes (32 on-chain + 42 off-chain), regardless of whether the computation result is 1 byte or 10 megabytes, and regardless of which signature families are active. Size invariance is the property that makes H33-74 viable in storage-expensive environments (Bitcoin outputs, smart contract storage slots, embedded device memory).</li>
+  <li><strong>Composable.</strong> Primitives can reference other primitives (via the primitive-referencing-primitive construction of &sect;9.5), and batches of primitives can be aggregated under a single Merkle root (&sect;5) with O(1/N) amortized cost. These two composition mechanisms &mdash; chaining and batching &mdash; are sufficient to encode arbitrary DAGs of attested computation events.</li>
+  <li><strong>Domain-separated.</strong> The computation type byte t provides protocol-level separation between attestation domains. Cross-type replay is cryptographically impossible: an attestation minted as type 0x0D (AI Inference) cannot verify as type 0x06 (Bitcoin UTXO) because the type byte is included in the signing message hash. This is a registry-level property, not an application-level convention.</li>
+</ol>
+
+<p>We do not claim novelty for any individual building block. SHA3 is not novel. Three-family signing bundles are not novel. Merkle aggregation is not novel. The claim is that no prior construction achieves all four properties simultaneously under post-quantum assumptions with a fixed-width output. The closest prior art &mdash; C2PA (variable-width, single-family), DSSE (no batching, no domain separation), Sigstore (not post-quantum, no fixed-width commitment) &mdash; satisfies subsets of these properties but not the conjunction. We are prepared to be corrected on this point and we welcome citations that predate our work.</p>
+
+<p>The proof-of-life application (&sect;9.9) is distinctive in that it composes the primitive's attestation with a ZK-STARK proof of computation correctness &mdash; the first instance in this paper where H33-74 attests not merely a result but the correctness of the computation that produced it.</p>
+
+<!-- ============================== -->
+<!-- SECTION 10: Related Work       -->
+<!-- ============================== -->
+<h2 class="section-title" id="s10">10. Related Work</h2>
+
+<h3 class="subsection-title" id="s10-1">10.1. Script-Layer Post-Quantum Bitcoin</h3>
+
+<p>The closest related work is the recent line of script-layer post-quantum Bitcoin constructions: Heilman's Lamport-in-script demonstration [@heilman2024], Linus's BINOHASH [@binohash2026], and Levy's QSB [@qsb2026]. These constructions attack a specific, well-defined threat: an adversary with Shor's algorithm who attempts to forge or rewrite a spending transaction. They achieve quantum-safe spending within existing Bitcoin consensus rules, without a soft fork. They are excellent works of cryptographic engineering and we consider them complementary to the present primitive rather than alternatives.</p>
+
+<p>The relationship is the following. QSB and BINOHASH operate inside Bitcoin script, at the layer where the Bitcoin full-node verifier runs. They protect the UTXO's spendability. They do not &mdash; and should not &mdash; attempt to attest the off-chain computation that produced the UTXO, because Bitcoin script is bounded to 201 non-push opcodes and 10,000 bytes for the explicit purpose of keeping full-node verification work bounded. H33-74 operates at the application layer, outside Bitcoin script. It does not &mdash; and should not &mdash; attempt to solve the script-layer forgery problem, because that problem is better solved by constructions like QSB and BINOHASH that live at the script layer and can take advantage of Bitcoin-specific primitives like FindAndDelete.</p>
+
+<table>
+  <thead>
+    <tr><th>Property</th><th>QSB / BINOHASH</th><th>H33-74</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Kind of object</td><td>Protocol construction</td><td>Primitive</td></tr>
+    <tr><td>Scope</td><td>Single-UTXO Bitcoin script</td><td>General-purpose attestation</td></tr>
+    <tr><td>Lives at</td><td>Bitcoin script layer</td><td>Application layer</td></tr>
+    <tr><td>Protects</td><td>UTXO spendability</td><td>Computation-result attestation</td></tr>
+    <tr><td>Hardness bet</td><td>One assumption (hash pre-image)</td><td>Three independent assumptions</td></tr>
+    <tr><td>Chain dependence</td><td>Bitcoin legacy script</td><td>None (chain-agnostic)</td></tr>
+    <tr><td>Proves</td><td>Transaction integrity under quantum adversary</td><td>Computation-result attestation</td></tr>
+    <tr><td>Softfork required</td><td>No</td><td>No</td></tr>
+  </tbody>
+</table>
+
+<p>The table is not a ranking. Each column describes a different kind of object. A production deployment that cares about both script-layer quantum safety for a specific UTXO and application-layer quantum safety for the computation that produced the UTXO would deploy both constructions, and we recommend that deployment pattern for institutions that require both.</p>
+
+<p>We note one small operational observation. A QSB transaction broadcast must be conducted via a non-standard mempool service (the paper references Marathon Slipstream) because QSB transactions exceed the default Bitcoin Core relay policy. A primitive attestation anchored via Taproot key-path tweak is indistinguishable from any other Taproot spend and adds zero marginal transaction weight; alternatively, an OP_RETURN anchor fits within standard transaction format. Both relay through any standard Bitcoin mempool. This is a deployment convenience, not a security property.</p>
+
+<h3 class="subsection-title" id="s10-2">10.2. Single-Family Attestation Schemes</h3>
+
+<p>RFC 9421: HTTP Message Signatures [@rfc9421] defines a wire format for signing HTTP message components with a single signature algorithm. A post-quantum deployment of RFC 9421 would pick one post-quantum signature family and sign each response independently. H33-74 differs in three ways: it provides three-family rather than single-family protection; it has a fixed 74-byte persistent footprint versus RFC 9421's raw signature payload of several kilobytes; and it admits batched Merkle aggregation for amortized cost, which RFC 9421 does not specify.</p>
+
+<p>Certificate Transparency [@ct2013] publishes all issued X.509 certificates to a globally-shared append-only log with Merkle inclusion proofs. Certificate Transparency's Merkle construction directly influences H33-74's batched aggregation construction in Section 5, and we credit the original CT paper accordingly. H33-74 differs from Certificate Transparency in that it uses three-family post-quantum signing rather than single-family classical signing, in that it does not require a single globally-shared log, and in that it supports arbitrary computation types via the append-only computation type registry (T) rather than being specialized to X.509 certificates.</p>
+
+<p>Sigstore [@sigstore2022] is a transparency-log-backed signing service for software artifacts using ephemeral keys and OIDC identity. H33-74 differs in its three-family post-quantum signing, its absence of dependence on an OIDC identity provider or a central log, and its generalization to arbitrary computation types.</p>
+
+<p>C2PA [@c2pa2023] is a media-authentication format for associating cryptographic metadata with digital media under classical single-family signatures. The primitive's media-capture application (Section 9.4) addresses the same problem space with three-family post-quantum signatures computed in firmware before any post-processing of the captured data.</p>
+
+<h3 class="subsection-title" id="s10-3">10.3. Content Addressing</h3>
+
+<p>IPFS [@ipfs2014] addresses data items by cryptographic hash, providing a content identifier that binds a name to the canonical bytes of the referenced data. The primitive's signing message field functions analogously as a content identifier, but additionally binds the content to a computation type, a timestamp, and a three-family signature. One may view H33-74's signing message as a content identifier with computational provenance.</p>
+
+<!-- ============================== -->
+<!-- SECTION 11: Open Problems      -->
+<!-- ============================== -->
+<h2 class="section-title" id="s11">11. Open Problems</h2>
+
+<p>We list several open questions concerning H33-74, in the hope of encouraging discussion and future work.</p>
+
+<h3 class="subsection-title" id="s11-1">11.1. Independence of the Three Hardness Assumptions</h3>
+
+<p>The three-family security argument of Section 6 relies on the informal claim that MLWE, SIS over NTRU, and hash pre-image resistance are cryptanalytically independent. This claim is empirically supported by the current state of the NIST PQC program &mdash; each of the three families is believed to stand or fall on its own &mdash; but it is not a theorem. A formal separation result would strengthen the security argument considerably.</p>
+
+<p>We offer the following structural rationale for believing the independence claim is reasonable, without claiming it constitutes a proof. MLWE and NTRU-SIS are both lattice problems, but they operate over different algebraic objects with different geometric structure. MLWE hardness relies on the difficulty of distinguishing noisy inner products over module lattices; the best known attacks reduce to the Block Korkin-Zolotarev (BKZ) lattice basis reduction algorithm with complexity exponential in the lattice dimension. NTRU-SIS hardness relies on the difficulty of finding short vectors in lattices defined by the NTRU key structure f&middot;g<sup>&minus;1</sup> mod q; the best known attacks combine lattice reduction with NTRU-specific combinatorial methods that exploit the ring structure in ways that do not apply to generic MLWE modules. The two problems share a common ancestor (worst-case lattice hardness) but the practical attack algorithms diverge. Importantly, no known reduction shows that breaking MLWE at useful parameters implies breaking NTRU-SIS at useful parameters, or vice versa. If such a reduction existed at practical parameters, it would be one of the most significant results in lattice cryptanalysis.</p>
+
+<p>SLH-DSA is categorically outside the lattice family. Its security reduces to the pre-image resistance of SHA2-256. A breakthrough in lattice algorithms &mdash; even one that simultaneously breaks both MLWE and NTRU-SIS &mdash; would have no bearing on SHA2-256 pre-image resistance, because hash functions have no algebraic structure for lattice techniques to exploit. This structural separation between the two lattice-based families and the hash-based family is the strongest element of the independence argument.</p>
+
+<p>Conversely, if a future cryptanalytic result reduces the effective independence of the first two families (for example, by exhibiting a reduction between MLWE and NTRU-SIS with useful parameters), then H33-74's security margin would narrow from three-family to approximately two-family (lattice + hash), and we would want to rotate one of the lattice families to a non-lattice replacement via the algorithm_flags mechanism of Definition 6. We consider formalizing this independence claim to be the most important open theoretical question concerning H33-74.</p>
+
+<h3 class="subsection-title" id="s11-2">11.2. Post-Quantum Hash Function Choice</h3>
+
+<p>H33-74 uses SHA3-256 (Keccak sponge construction, NIST FIPS 202) for the content digest, the signing message, and the internal Merkle tree. We acknowledge that SHA3-256 is less widely deployed and less battle-tested in the Bitcoin ecosystem than SHA2-256 (Merkle-Damg&aring;rd construction), which Bitcoin uses natively for block hashing, transaction identifiers, and address derivation. SHA3-256 was chosen for H33-74 because its sponge construction provides a structurally different security argument from SHA2-256, offering defense-in-depth if a future weakness is found in Merkle-Damg&aring;rd constructions. This choice is a design decision, not a claim that SHA2-256 is insufficient.</p>
+
+<p>We note that a content-addressable storage layer using SHA2-256 addresses &mdash; parallel to the SHA3-256 signing message &mdash; would provide native interoperability with Bitcoin full nodes and IPFS without requiring an adapter layer. This dual-hash approach (SHA3-256 for security properties, SHA2-256 for ecosystem addressing) is under consideration for a future version.</p>
+
+<p>Grover's algorithm reduces the effective pre-image resistance of a 256-bit hash from 2<sup>256</sup> to 2<sup>128</sup> and the effective collision resistance from 2<sup>128</sup> to 2<sup>85.3</sup>. Both figures remain well above any practical threshold, but an adversary with extraordinary quantum resources would shift the security margin. An upgrade to SHA3-384 or SHA3-512 is plausible, at the cost of increased primitive width. We have not committed to this upgrade and consider it an open design question.</p>
+
+<p>We note that larger hash functions are a per-deployment option for chains that natively use larger digests. The upgrade path is not abstract &mdash; a deployment targeting a chain whose native hash is SHA3-384 or SHA2-512 can select the corresponding hash width at mint time, and the primitive's wire format accommodates the change by widening the content digest field. We observe that some chains claim to use larger hashes but in practice rely on secp256k1 ECDSA for transaction signing (Hedera, for example, advertises SHA-384 but signs with secp256k1), so the effective post-quantum security of the chain's native hash is not always what it appears. Deployments should verify the actual hash used in the chain's consensus-critical path, not the marketing claim.</p>
+
+<h3 class="subsection-title" id="s11-3">11.3. Formal Verification of Batched Aggregation</h3>
+
+<p>The Merkle aggregation construction of Section 5 is straightforward but relies on correct domain separation between leaf and internal node hashing (leaves are prefixed with 0x00, internal nodes with 0x01). A formal proof of second-preimage resistance of the aggregation construction under a random-oracle model for SHA3-256 would be a useful addition and would improve our confidence in the construction at very large N.</p>
+
+<h3 class="subsection-title" id="s11-4">11.4. Standardization</h3>
+
+<p>The primitive's wire format is a reference implementation, not a formal standard. A formal standardization effort through an appropriate body (we suspect IETF for the HTTP wire protocol aspects, and potentially an ISO or IEEE track for the computation type registry) is a direction we would welcome and for which we invite collaboration.</p>
+
+<h3 class="subsection-title" id="s11-5">11.5. Integration with BitVM</h3>
+
+<p>BitVM [@bitvm2023] defines a framework for off-chain Bitcoin program execution with on-chain dispute resolution. The primitive's arbitrary-computation attestation would fit naturally as an attestation layer for BitVM execution traces, providing three-family post-quantum protection of each computation step. Integration work has not yet begun and is a direction we consider worth pursuing jointly with the BitVM authors.</p>
+
+<h3 class="subsection-title" id="s11-6">11.6. Threshold-of-Two Verification During Family Rotation</h3>
+
+<p>The current construction requires all three signature families to verify (the algorithm_flags byte must indicate all three are present, and the Verify algorithm checks all three in steps 6-8). If one family suffers a surprise cryptanalytic weakness, the secure response is to rotate the weakened family out and replace it with a stronger alternative via the algorithm_flags mechanism.</p>
+
+<p>During the rotation window, however, existing primitives signed under the old three-family bundle cannot be re-signed. A verifier encountering a pre-rotation primitive faces a choice: reject it (because one of the three families is now considered weak) or accept it under a two-of-three threshold (because the remaining two families are intact). The algorithm_flags field supports partial verification mechanically, but the security implications of accepting two-of-three verification as a backwards-compatibility measure during a rotation event have not been analyzed.</p>
+
+<p>We consider this the most deployment-relevant open problem. A formal treatment would specify: (a) the conditions under which two-of-three acceptance is safe, (b) the maximum duration of a rotation window during which the relaxed threshold applies, and (c) whether the compact receipt's commitment digest c should be recomputed over only the surviving signatures or left unchanged. We invite the community's input on this question, as the answer has direct implications for the operational procedures of any large-scale primitive deployment. We recommend that production deployments treat rotation semantics as a pre-launch requirement to specify internally, even if the formal cryptographic analysis is deferred. Operating without a specified rotation policy means that a surprise family compromise places every existing primitive in an ambiguous verification state &mdash; an operational risk that should be resolved before, not after, the event.</p>
+
+<h3 class="subsection-title" id="s11-7">11.7. Identity-Bound Document Attestation</h3>
+
+<p>The legal evidence chain of custody application (Section 9.5) attests document integrity but not document authenticity. A forged document attested by a valid signing key produces a valid primitive. We identify the composition of a document attestation primitive with a verified identity credential primitive &mdash; via the primitive-referencing-primitive construction &mdash; as a direction worth formalizing. The resulting construction binds the submitter's verified identity to the document attestation event, creating a cryptographically verifiable record of who presented the document, when, and what they presented. This composition has direct application to title insurance, land registries, court filings, and regulated document intake systems. The formal security properties of the composed construction &mdash; particularly the conditions under which the identity binding is unforgeable independently of the document binding &mdash; are an open question.</p>
+
+<h3 class="subsection-title" id="s11-8">11.8. Crypto-Agile Algorithm Slot Architecture</h3>
+
+<p>The algorithm_flags byte in the compact receipt (Definition 6) is an 8-bit bitmask that encodes which signature families are present in the attestation. The reference deployment uses 0x07 (binary 00000111), meaning slots 1, 2, and 3 are active &mdash; ML-DSA-65, FALCON-512, and SLH-DSA-SHA2-128f respectively. Slots 4 through 8 are reserved and unused.</p>
+
+<p>This bitmask architecture is directly aligned with the NIST Crypto Agility framework, which mandates that cryptographic systems be capable of disabling compromised algorithms and enabling replacement algorithms without requiring software updates to deployed infrastructure. The H33-74 flags byte satisfies this requirement by construction: any valid subset of the 8 registered algorithm slots can be activated or deactivated at mint time by changing the bitmask value. A verifier that encounters an unfamiliar bitmask value can determine which algorithms are active by inspecting the individual bits and verify only the families it recognizes, providing both forward and backward compatibility.</p>
+
+<p>The operational implications are significant. If a cryptanalytic advance compromises one of the three active families &mdash; for example, a practical attack on NTRU-SIS that breaks FALCON-512 &mdash; the remediation is: (1) register a replacement algorithm in an unused slot (e.g., slot 4), (2) update the default bitmask from 0x07 to 0x1D (binary 00011101: slots 1, 3, 4, 5 active), and (3) the next mint produces a valid attestation under the new family composition. No binary recompilation. No software distribution. No flag-day cutover. The bitmask change propagates through the existing license fingerprint mechanism (&sect;8.3) at the next billing-period reconciliation.</p>
+
+<p>We consider formalizing the algorithm slot registry &mdash; including the registration criteria for new slots, the governance process for activating and deactivating families, and the verification semantics when a verifier encounters an attestation whose bitmask includes families it does not support &mdash; to be an important direction for future work. The structural foundation is already present in the wire format; the policy and governance layer is what remains to be specified.</p>
+
+<h3 class="subsection-title" id="s11-9">11.9. Zero-Knowledge Proof of Computation Integrity</h3>
+
+<p>Section 1.2 identifies a fundamental limitation of H33-74: the primitive attests that a result was signed, not that it was correctly computed. The proof-of-life construction in &sect;9.9 closes this gap for one specific computation &mdash; secp256k1 discrete logarithm knowledge &mdash; by composing a ZK-STARK proof of computation correctness with an H33-74 attestation of the proof's validity.</p>
+
+<p>The natural generalization is to extend this pattern to other computation types. An AI inference attestation (type 0x0D) currently proves that the named model produced a signed output; it does not prove that the inference was performed correctly &mdash; that is, that the output is the result of applying the model weights to the input. A ZK-STARK proof of correct inference, whose commitment is bound to the H33-74 primitive, would close this gap. Similarly, a fraud-score computation (type 0x02) could be accompanied by a STARK proof that the score was computed according to a published scoring function, without revealing the input data.</p>
+
+<p>The challenge is circuit complexity. The secp256k1 proof-of-life circuit requires approximately 213,000 Goldilocks field constraints for 256 scalar multiplication steps &mdash; a non-trivial but tractable construction. A proof of correct neural-network inference for even a modest model would require orders of magnitude more constraints, likely necessitating recursive proof composition or a different proof system architecture. Whether ZK-STARK proofs of computation correctness can be made practical for the full range of computation types that H33-74 supports is an open question with significant implications for the primitive's long-term value proposition. We consider this the most technically ambitious open problem on this list.</p>
+
+<!-- ============================== -->
+<!-- SECTION 12: Conclusion         -->
+<!-- ============================== -->
+<h2 class="section-title" id="s12">12. Conclusion</h2>
+
+<p>We have described H33-74, a 74-byte post-quantum attestation primitive that binds arbitrary computation results to a three-family signature bundle (ML-DSA-65, FALCON-512, SLH-DSA-SHA2-128f) at a persistent footprint independent of computation data volume. H33-74 is chain-agnostic and transport-agnostic; we have described applications to post-quantum Bitcoin UTXO attestation, HTTP API response attestation, AI inference provenance, capture-time media authenticity, legal evidence chain-of-custody, federated machine-learning mesh, authenticated relay messaging, identity credential attestation, and post-quantum proof of life &mdash; the last of which composes a ZK-STARK proof of secp256k1 discrete logarithm knowledge with the primitive's three-family attestation, binding classical key control to a post-quantum identity without revealing the private key.</p>
+
+<p>H33-74 is intended to complement, not replace, the excellent recent work on script-layer post-quantum Bitcoin constructions by Heilman, Linus, and Levy. Their constructions protect Bitcoin UTXOs against script-layer signature forgery. H33-74 attests the computations that produced those UTXOs. The two kinds of object are complementary, and a production deployment that cares about both should deploy both.</p>
+
+<p>We offer H33-74 to the Bitcoin developer community and the wider post-quantum cryptography community for review, criticism, and improvement. We are particularly interested in feedback on the three-family independence argument of Section 6, on the practical deployment patterns discussed in Section 8, and on the open problems listed in Section 11. Corrections to any of the related-work characterizations in Section 10 are especially welcome and should be communicated to the contact address below.</p>
+
+<p>We close with an observation about the composition of H33-74 with Bitcoin's existing infrastructure. H33-74's computation-agnostic design, when anchored through Bitcoin's existing Taproot key-path tweak or OP_RETURN mechanism, suggests an architectural property that we believe deserves explicit attention: Bitcoin's unmodified transaction infrastructure may be sufficient to serve as a post-quantum attestation anchor for arbitrary computation across a wide range of domains. H33-74 does not upgrade Bitcoin. It does not require a single line of Bitcoin consensus code to change. It composes with an existing capability &mdash; fixed-width data embedding in Taproot outputs &mdash; to produce what appears to be a general-purpose attestation anchor whose trust properties are inherited from the Bitcoin ledger's own consensus security. To our knowledge, H33-74 is the first primitive to exercise this composition systematically, though we do not claim it is the only way to do so.</p>
+
+<p>The implications extend beyond the nine applications enumerated in Section 9. The same 74-byte primitive that attests a biometric match or a legal evidence chain can attest a tokenized real-world asset issuance, serve as a cryptographic checkpoint in a multi-stage FHE pipeline, or anchor autonomous AI agent delegation chains. Each reduces to the same object: a 58-byte primitive whose 32-byte hash is committed to Bitcoin via a standard Taproot tweak. No new opcodes. No consensus changes. No soft fork.</p>
+
+<p>Post-quantum Bitcoin is a hard problem and none of us is going to solve it alone. We are grateful for the work that came before this paper and we look forward to the work that will come after it.</p>
+
+<!-- ============================== -->
+<!-- SECTION 13: Acknowledgements   -->
+<!-- ============================== -->
+<h2 class="section-title" id="s13">13. Acknowledgements</h2>
+
+<p>The author is grateful to Ethan Heilman for the original Lamport-in-script demonstration that opened this design space; to Robin Linus for BINOHASH, which established that a practical in-script post-quantum construction was achievable under existing consensus rules; and to Avihu Mordechai Levy for QSB, which closed a sharp vulnerability in BINOHASH's proof-of-work puzzle and set the current bar for script-layer post-quantum Bitcoin. This paper would not have the form it does without the prior work of those three authors, and any technical errors or misstatements about their constructions in Section 10 are the present author's alone.</p>
+
+<p>The author also thanks the NIST Post-Quantum Cryptography standardization team for providing the three signature families on which this primitive rests, and the SHA-3 standardization team for providing the hash function on which everything else is built.</p>
+
+<p>The author thanks Luke Dashjr for his public engagement on anchoring challenges, which contributed to the analysis that led to the Taproot key-path tweak as the preferred zero-weight anchoring method.</p>
+
+<p>The author extends special thanks to Ian Smith, co-author of BIP-361, CEO of QuantumEVM (<a href="https://x.com/IanSmith_HSA" style="color:var(--gold)">@IanSmith_HSA</a>), whose rigorous technical review during the editing process saved the author from several errors that would have distracted from the substance of this paper. His detailed technical feedback on SHA2/SHA3 disambiguation, the FALCON floating-point sampler concern and FALCON+ integer variant, the distinction between NIST security level and forgery resistance, Y2038 timestamp compliance, SHA2-256 storage addressing for Bitcoin/IPFS interoperability, and the crypto-agile algorithm slot architecture (&sect;11.8) which resolved the family-composition question of Section 6.2 by identifying the algorithm_flags bitmask as a NIST-aligned crypto-agility mechanism &mdash; several corrections and one new open problem in this version of the paper are directly attributable to his review.</p>
+
+<!-- ============================== -->
+<!-- Appendix A                     -->
+<!-- ============================== -->
+<h2 class="section-title" id="appendix-a">Appendix A. Benchmark Methodology</h2>
+
+<p>All performance figures in Section 7 are drawn from a single benchmark session conducted on 2026-04-13. This appendix documents the conditions under which those figures were produced.</p>
+
+<p><strong>Hardware.</strong> AWS c8g.metal-48xl bare-metal instance (192 vCPUs, 371 GiB RAM, Graviton4 ARM Neoverse V2), us-east-1. On-demand pricing at approximately $2.30/hr. The Nitro-virtualized comparison was measured on c8g.48xlarge (same physical hardware, Nitro hypervisor active).</p>
+
+<p><strong>Software.</strong> Proprietary Rust implementation compiled in release mode for aarch64. Implementation details are trade secrets of H33.ai, Inc.</p>
+
+<p><strong>Concurrency.</strong> 96 workers on the 192-vCPU metal instance, each running the full pipeline in a tight loop. Batches of 32 users per signing event.</p>
+
+<p><strong>Measurement.</strong> 30-second sustained measurement window after a 5-second warmup. Throughput computed as total completed authentications divided by elapsed wall-clock time. The 30-second window was chosen to capture steady-state behavior including cache warming.</p>
+
+<p><strong>Reproducibility.</strong> Raw benchmark logs, including per-second throughput samples and batch latency histograms, are retained at the author's site and available for independent review upon request.</p>
+
+<!-- ============================== -->
+<!-- Appendix B                     -->
+<!-- ============================== -->
+<h2 class="section-title" id="appendix-b">Appendix B. Pricing and Licensing <span style="font-size:0.7em;font-weight:400;color:var(--gray);text-transform:uppercase;letter-spacing:0.05em;">(Non-Normative)</span></h2>
+
+<p><em>This section describes the reference commercial implementation's pricing model and is non-normative. The cryptographic construction is independent of the economic model.</em></p>
+
+<p>H33-74 is pricing-agnostic at the protocol level. The reference commercial implementation offers a flat $0.025 per-mint launch rate for all computation types, with global aggregate volume pricing that reduces the rate for all participants as adoption grows. A free developer tier (10,000 mints per month, no credit card) is available for prototyping and integration. Available license tiers, current pricing, and commercial terms are published at <a href="https://h33.ai/pricing/" style="color:var(--gold)">h33.ai/pricing</a>.</p>
+
+<p>The flat per-mint rate is chosen for simplicity and to remove any incentive to misclassify computation types. We acknowledge that the economic consequence of a mint varies significantly by application &mdash; a single primitive anchoring a Layer 2 batch settlement carries different economic weight than a single biometric attestation. Whether differentiated pricing by computation type or by downstream economic consequence is appropriate is an open question that the market will answer as adoption grows. The append-only computation type registry (&sect;3, Definition 2) provides the technical foundation for differentiated pricing in future implementations without changes to the primitive construction itself.</p>
+
+<!-- Appendix B sections removed — pricing details at h33.ai/pricing -->
+
+
+
+
+<!-- ============================== -->
+<!-- SECTION 14: References         -->
+<!-- ============================== -->
+<h2 class="section-title" id="s14">14. References</h2>
+
+<p>[@shor1994] P. W. Shor. Algorithms for quantum computation: discrete logarithms and factoring. In Proceedings of the 35th Annual Symposium on Foundations of Computer Science, pages 124&ndash;134, 1994.</p>
+<p>[@grover1996] L. K. Grover. A fast quantum mechanical algorithm for database search. In Proceedings of the 28th Annual ACM Symposium on Theory of Computing, pages 212&ndash;219, 1996.</p>
+<p>[@merkle1979] R. C. Merkle. Secrecy, authentication, and public key systems. Ph.D. thesis, Stanford University, 1979.</p>
+<p>[@lamport1979] L. Lamport. Constructing digital signatures from a one-way function. Technical Report SRI-CSL-98, SRI International, 1979.</p>
+<p>[@bls2001] D. Boneh, B. Lynn, and H. Shacham. Short signatures from the Weil pairing. In Advances in Cryptology &mdash; ASIACRYPT 2001, pages 514&ndash;532, 2001.</p>
+<p>[@kzg2010] A. Kate, G. M. Zaverucha, and I. Goldberg. Constant-size commitments to polynomials and their applications. In Advances in Cryptology &mdash; ASIACRYPT 2010, pages 177&ndash;194, 2010.</p>
+<p>[@heilman2024] E. Heilman. Signing a Bitcoin transaction with Lamport signatures (no OP_CAT). Bitcoin Development Mailing List, 2024.</p>
+<p>[@binohash2026] R. Linus. BINOHASH: Transaction introspection without soft forks. 2026.</p>
+<p>[@qsb2026] A. M. Levy. Quantum-safe Bitcoin transactions without soft forks. StarkWare, April 2026.</p>
+<p>[@fips203] National Institute of Standards and Technology. Module-lattice-based key-encapsulation mechanism standard. FIPS 203, 2024.</p>
+<p>[@fips204] National Institute of Standards and Technology. Module-lattice-based digital signature standard. FIPS 204, 2024.</p>
+<p>[@fips205] National Institute of Standards and Technology. Stateless hash-based digital signature standard. FIPS 205, 2024.</p>
+<p>[@falcon2022] P.-A. Fouque et al. FALCON: Fast-Fourier lattice-based compact signatures over NTRU. NIST PQC Round 3 submission, 2022.</p>
+<p>[@ct2013] B. Laurie, A. Langley, and E. Kasper. Certificate transparency. RFC 6962, 2013.</p>
+<p>[@sigstore2022] Z. Newman, J. S. Meyers, and S. Torres-Arias. Sigstore: Software signing for everybody. In CCS, 2022.</p>
+<p>[@c2pa2023] Coalition for Content Provenance and Authenticity. C2PA content credentials specification. 2023.</p>
+<p>[@ipfs2014] J. Benet. IPFS &mdash; content addressed, versioned, peer-to-peer file system. arXiv:1407.3561, 2014.</p>
+<p>[@bitvm2023] R. Linus. BitVM: Compute anything on Bitcoin. 2023.</p>
+<p>[@rfc9421] A. Backman, J. Richer, and M. Sporny. HTTP message signatures. RFC 9421, 2024.</p>
+
+<!-- ============================== -->
+<!-- SECTION 15: Contact            -->
+<!-- ============================== -->
+<h2 class="section-title" id="s15">15. Contact</h2>
+
+<p>H33.ai, Inc.<br>
+Author: Eric Beans<br>
+Email: research@h33.ai</p>
+
+<p>Correspondence welcome. Corrections to any technical statement in this paper will be incorporated in a revised version with attribution to the contributor at their option. Errata and pull requests: <a href="https://github.com/H33ai-postquantum" style="color:var(--gold)">github.com/H33ai-postquantum</a>.</p>
+
+<p>This document describes H33-74 specification version v = 1 (the version byte defined in Definition 3). Future specification revisions will increment v accordingly; the computation type registry and algorithm flags byte are designed for forward compatibility without version-byte changes.</p>
+
+<!-- FOOTER -->
+<footer>
+  H33.ai, Inc. | Patent Pending | Application #19/645,499
+</footer>
+
+</div><!-- /.container -->
+
+
+
+
+
+
+
+</body>
+</html>
