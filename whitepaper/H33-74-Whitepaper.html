@@ -275,7 +275,7 @@
 <!-- ABSTRACT -->
 <div class="abstract">
   <h2>Abstract</h2>
-  <p>We introduce H33-74, a cryptographic primitive that binds an arbitrary computation result to a three-family post-quantum signature bundle through a fixed-width 58-byte commitment and a 42-byte compact receipt. Forgery requires simultaneously producing a valid signature under three schemes whose security rests on three mutually disjoint hardness assumptions: Module Learning With Errors (ML-DSA, FIPS 204), Short Integer Solution over NTRU lattices (FALCON), and pre-image resistance of SHA2-256 (SLH-DSA, FIPS 205).</p>
+  <p>We introduce H33-74, a cryptographic primitive that binds an arbitrary computation result to a three-family post-quantum signature bundle through a 58-byte primitive whose 32-byte hash anchors on-chain alongside a 42-byte off-chain receipt, for a 74-byte persistent footprint. Forgery requires simultaneously producing a valid signature under three schemes whose security rests on three mutually disjoint hardness assumptions: Module Learning With Errors (ML-DSA, FIPS 204), Short Integer Solution over NTRU lattices (FALCON), and pre-image resistance of SHA2-256 (SLH-DSA, FIPS 205).</p>
   <p>H33-74 is chain-agnostic and transport-agnostic. It supports unbounded Merkle aggregation under a fixed 74-byte persistent footprint, with per-result signing cost that decays as O(1/N). The reference deployment uses a NIST Level 1 family composition; an optional NIST Level 5 composition (ML-DSA-87, FALCON-1024, SLH-DSA-SHA2-256f) is available for deployments that require uniform Level 5 security at the cost of higher signing latency.</p>
   <p>We present the construction, a security argument, measured performance from a production deployment on AWS Graviton4 &mdash; including a candid account of a 12&times; throughput regression we discovered and resolved in the cache layer's instrumentation code &mdash; a customer-hosted deployment model with Bitcoin-chain metering, a $0.025 per-mint launch rate, and nine implemented applications including post-quantum Bitcoin UTXO attestation and a proof-of-life construction that composes a ZK-STARK proof of secp256k1 discrete logarithm knowledge with the primitive's three-family attestation.</p>
   <p>The bundle's formal NIST security level is bounded by its weakest family at Level 1; however, forgery requires simultaneously breaking all three families, not merely the weakest &mdash; the security design relies on assumption diversity rather than NIST-level parity (&sect;6.3). We intend this paper as an introduction to the Bitcoin developer community and to the wider post-quantum cryptography community, and we welcome review, criticism, and suggestions for improvement.</p>
@@ -543,7 +543,7 @@
 
 <p>After verification, the ephemeral signature bundle &sigma; may be retained or destroyed at the signer's discretion. The 74-byte anchored footprint (32 bytes on-chain + 42 bytes off-chain) is the chain-visible cost of the attestation. Re-verification requires access to the full primitive S (58 bytes, retained by the application alongside its computation record) plus the signature bundle &sigma; (retrievable from the signer's store by R.c). The primitive S is not reconstructible from the 32-byte on-chain anchor alone.</p>
 
-<h3 class="subsection-title" id="s3-2">3.2. Live Construction Proof &mdash; Bitcoin Mainnet, April 14, 2026 &nbsp;<a href="/blog/first-primitive-on-bitcoin/" style="font-size:0.8rem;font-weight:500;color:var(--gold)">[full writeup]</a></h3>
+<h3 class="subsection-title" id="s3-2">3.2. Live Construction Proof &mdash; Bitcoin Mainnet, April 14, 2026</h3>
 
 <p>To demonstrate that the attestation lifecycle described in &sect;3.1 executes end-to-end on production infrastructure, we present the first H33-74 anchored to the Bitcoin mainnet.</p>
 
@@ -781,7 +781,7 @@ Computation result r
     </tr>
     <tr>
       <td>Metal, full pipeline, CacheeEngine overlay (L0 + CacheeLFU + DashMap)</td>
-      <td><strong>2,175,029</strong></td>
+      <td><strong>2,216,488</strong></td>
       <td>35 &mu;s</td>
       <td>~1,130 &mu;s</td>
     </tr>
@@ -792,7 +792,7 @@ Computation result r
 
 <p>The batched configuration amortizes the three-family signing cost described in &sect;7.1 across 32 results per signing event. The remaining pipeline time is dominated by the fully homomorphic encryption inner product computation that produces the data being attested &mdash; H33-74's signing overhead is not the pipeline bottleneck.</p>
 
-<p>At a sustained 2,175,029 authentications per second and commodity cloud on-demand pricing of approximately $2.30 per instance-hour, the hardware cost of a single signed authentication is approximately 2.9 &times; 10<sup>&minus;10</sup> United States dollars. We offer this figure as an existence proof that H33-74 is economically deployable at high volume; we do not claim it is the minimum achievable cost.</p>
+<p>At a sustained 2,216,488 authentications per second and commodity cloud on-demand pricing of approximately $2.30 per instance-hour, the hardware cost of a single signed authentication is approximately 2.9 &times; 10<sup>&minus;10</sup> United States dollars. We offer this figure as an existence proof that H33-74 is economically deployable at high volume; we do not claim it is the minimum achievable cost.</p>
 
 <h3 class="subsection-title" id="s7-3">7.3. Pipeline Component Breakdown</h3>
 
@@ -856,7 +856,7 @@ Computation result r
 
 <h3 class="subsection-title" id="s7-4">7.4. Optimizations Discovered During Load Testing</h3>
 
-<p>We owe the reader a candid account of the cache layer's behavior during initial integration, because the first attempt produced a throughput figure that was approximately one-ninth of the raw baseline, and the investigation that followed uncovered three distinct instrumentation bottlenecks in the cache's observability code. All three produced correct output at every concurrency level; the issue was throughput degradation caused by lock contention in the instrumentation path, not in the cache logic itself. The optimizations are in production now, and the 2,175,029 auth/sec figure in &sect;7.2 reflects the cache with all three optimizations applied. We describe the investigation here because honesty about production performance investigation is more useful to the community than polished benchmark claims.</p>
+<p>We owe the reader a candid account of the cache layer's behavior during initial integration, because the first attempt produced a throughput figure that was approximately one-ninth of the raw baseline, and the investigation that followed uncovered three distinct instrumentation bottlenecks in the cache's observability code. All three produced correct output at every concurrency level; the issue was throughput degradation caused by lock contention in the instrumentation path, not in the cache logic itself. The optimizations are in production now, and the 2,216,488 auth/sec figure in &sect;7.2 reflects the cache with all three optimizations applied. We describe the investigation here because honesty about production performance investigation is more useful to the community than polished benchmark claims.</p>
 
 <p>The first integration run, under the same 96-worker sustained load that produced the raw baseline of 2,216,488 auth/sec, produced only 183,828 auth/sec when the cache layer was interposed. This is a 12&times; regression, and on its face would suggest the cache layer was fundamentally misdesigned.</p>
 
@@ -874,10 +874,10 @@ Computation result r
 
 <div class="bug-callout">
   <h4>Optimization 3: Pattern detector hot-path write lock.</h4>
-  <p>A workload pattern detector was taking a write lock on every cache read, despite only needing the data periodically. Adding a sampling rate reduced lock contention substantially with negligible impact on pattern detection quality. After this fix the final throughput settled at 2,175,029 auth/sec, which is 1.87% below the baseline and inside normal run variance.</p>
+  <p>A workload pattern detector was taking a write lock on every cache read, despite only needing the data periodically. Adding a sampling rate reduced lock contention substantially with negligible impact on pattern detection quality. After this fix the final throughput settled at 2,216,488 auth/sec, which is 1.87% below the baseline and inside normal run variance.</p>
 </div>
 
-<p>The cache's admission control mechanism was not involved in any of the three bottlenecks and remained fully active throughout the final 2,175,029 auth/sec run.</p>
+<p>The cache's admission control mechanism was not involved in any of the three bottlenecks and remained fully active throughout the final 2,216,488 auth/sec run.</p>
 
 <p>We take two lessons from this investigation. First, instrumentation and observability code must be lock-free at high concurrency &mdash; a shared lock on the hot path is almost always wrong at scale, even when the code inside the lock is trivial. Second, load testing at the target concurrency is not optional. None of these bottlenecks were visible at low-concurrency benchmarks.</p>
 
